@@ -1,6 +1,6 @@
 # CRE Intelligence Dashboard
 
-A professional, fully interactive Commercial Real Estate (CRE) web dashboard built with **100% free APIs** and open-source libraries. Designed for MBA-level market analysis with heavy focus on the **Research Triangle, NC** (Raleigh-Durham-Chapel Hill).
+A fully interactive Commercial Real Estate (CRE) web dashboard built with **100% free APIs** and open-source libraries. Designed for market analysis with a focus on the Triangle region of NC (Raleigh-Durham-Chapel Hill).
 
 ---
 

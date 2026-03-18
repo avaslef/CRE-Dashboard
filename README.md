@@ -78,7 +78,7 @@ The app opens at **http://localhost:8501**
 
 ---
 
-## Free Deployment (Share with Professor)
+## Free Deployment
 
 ### Streamlit Community Cloud (100% free)
 
@@ -157,7 +157,7 @@ CRE Dashboard/
 
 ---
 
-## For the MBA Classroom
+## Concepts Covered
 
 Key CRE concepts covered:
 - **Market tiering** — Gateway, Tier 1, Tier 2/Emerging classification

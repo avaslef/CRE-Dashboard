@@ -8,17 +8,10 @@ from helpers import (
     fetch_fred_latest, fetch_fred_multi,
     api_key_warning, source_badge, render_glossary_expander,
     metric_card, insight_card, tier_badge, df_download_btn, fig_download_btn,
-    load_css, render_sidebar,
+    load_css, render_sidebar, render_footer,
     FRED_KEY,
 )
 from charts import line_chart, bar_chart
-
-st.set_page_config(
-    page_title="Market Tiers — CRE Intelligence",
-    page_icon="🗂️",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 load_css()
 render_sidebar()
@@ -116,9 +109,4 @@ with tab_gw: _trend_tab("Gateway")
 with tab_t1: _trend_tab("Tier 1")
 with tab_t2: _trend_tab("Tier 2 / Emerging")
 
-st.divider()
-st.markdown("""
-<div style="text-align:center;padding:8px 0;color:#475569;font-size:0.78em">
-  CRE Intelligence Dashboard &nbsp;·&nbsp; Data: FRED, U.S. Census, NewsAPI &nbsp;·&nbsp;
-  Built with Streamlit + Plotly &nbsp;·&nbsp; Alexander Vaslef
-</div>""", unsafe_allow_html=True)
+render_footer()

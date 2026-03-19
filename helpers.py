@@ -98,6 +98,15 @@ def fetch_census_population(state_fips: str = "37") -> pd.DataFrame:
         df = pd.DataFrame(data[1:], columns=data[0])
         df["population"] = pd.to_numeric(df["B01003_001E"], errors="coerce")
         return df[["NAME", "population", "state", "county"]]
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching Census population data: {e}")
+        return pd.DataFrame()
+    except ValueError:
+        st.warning(
+            "Census API returned an unexpected response — the API key may be invalid "
+            "or the endpoint is temporarily unavailable."
+        )
+        return pd.DataFrame()
     except Exception as e:
         st.warning(f"Census population fetch failed: {e}")
         return pd.DataFrame()
@@ -127,6 +136,15 @@ def fetch_census_cbp(state_fips: str = "37", naics: str = "531") -> pd.DataFrame
         for col in ["EMP", "PAYANN", "ESTAB"]:
             df[col] = pd.to_numeric(df[col], errors="coerce")
         return df
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching Census CBP data: {e}")
+        return pd.DataFrame()
+    except ValueError:
+        st.warning(
+            "Census CBP API returned an unexpected response — the API key may be invalid "
+            "or the endpoint is temporarily unavailable."
+        )
+        return pd.DataFrame()
     except Exception as e:
         st.warning(f"Census CBP fetch failed: {e}")
         return pd.DataFrame()
@@ -175,6 +193,15 @@ def fetch_census_median_income(state_fips: str = "37") -> pd.DataFrame:
         df = pd.DataFrame(data[1:], columns=data[0])
         df["median_income"] = pd.to_numeric(df["B19013_001E"], errors="coerce")
         return df[["NAME", "median_income", "state", "county"]]
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching Census median income data: {e}")
+        return pd.DataFrame()
+    except ValueError:
+        st.warning(
+            "Census API returned an unexpected response — the API key may be invalid "
+            "or the endpoint is temporarily unavailable."
+        )
+        return pd.DataFrame()
     except Exception as e:
         st.warning(f"Census median income fetch failed: {e}")
         return pd.DataFrame()
@@ -585,9 +612,28 @@ def df_download_btn(df: "pd.DataFrame", filename: str, label: str = "⬇ Export 
     st.download_button(label, csv, file_name=filename, mime="text/csv")
 
 
-def fig_download_btn(fig: "go.Figure", filename: str, label: str = "⬇ Export PNG"):
+def fig_download_btn(fig: "go.Figure", filename: str, label: str = "⬇ Export Chart"):
+    """Export chart as PNG (via kaleido) or interactive HTML if kaleido unavailable."""
     try:
         img_bytes = fig.to_image(format="png", width=1200, height=600)
-        st.download_button(label, img_bytes, file_name=filename, mime="image/png")
+        st.download_button(label + " (PNG)", img_bytes,
+                           file_name=filename, mime="image/png")
     except Exception:
-        st.caption("Install `kaleido` for PNG export: `pip install kaleido`")
+        # Fallback: export as self-contained interactive HTML — no extra deps needed
+        html_bytes = fig.to_html(full_html=True, include_plotlyjs="cdn").encode("utf-8")
+        html_filename = filename.replace(".png", ".html")
+        st.download_button(label + " (HTML)", html_bytes,
+                           file_name=html_filename, mime="text/html")
+
+
+def render_footer():
+    """Shared footer with full data source attribution."""
+    st.divider()
+    st.markdown("""
+<div style="text-align:center;padding:8px 0;color:#64748b;font-size:0.78em;line-height:1.8">
+  <b style="color:#475569">CRE Intelligence Dashboard</b><br>
+  Data sources: FRED (St. Louis Fed) &nbsp;·&nbsp; U.S. Census Bureau &nbsp;·&nbsp;
+  NewsAPI.org &nbsp;·&nbsp; Zillow Research &nbsp;·&nbsp; Google Trends &nbsp;·&nbsp;
+  BEA (Bureau of Economic Analysis) &nbsp;·&nbsp; Yahoo Finance (yfinance)<br>
+  Built with Streamlit + Plotly &nbsp;·&nbsp; Alexander Vaslef
+</div>""", unsafe_allow_html=True)

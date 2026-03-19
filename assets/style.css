@@ -6,21 +6,21 @@
   --unc-navy: #13294B;
   --unc-light: #7BAFD4;
   --unc-white: #FFFFFF;
-  --bg-primary: #0b0f19;
-  --bg-card: #111827;
-  --bg-card-end: #1a2640;
-  --border-subtle: rgba(75,156,211,0.15);
-  --border-hover: rgba(75,156,211,0.4);
+  --bg-primary: #1e2235;
+  --bg-card: #252b40;
+  --bg-card-end: #2d3455;
+  --border-subtle: rgba(75,156,211,0.18);
+  --border-hover: rgba(75,156,211,0.45);
   --text-primary: #f1f5f9;
   --text-secondary: #4B9CD3;
   --text-muted: #7BAFD4;
-  --text-dim: #64748b;
+  --text-dim: #8899aa;
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
 html, body, [class*="css"]  { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 .main { background: var(--bg-primary); }
-section[data-testid="stSidebar"] { background: #0c1021; border-right: 1px solid #1a2540; }
+section[data-testid="stSidebar"] { background: #191e30; border-right: 1px solid #2a3050; }
 section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6px 0; }
 
 /* ── Metric cards ─────────────────────────────────────────────────────── */
@@ -69,7 +69,7 @@ section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6
 
 /* ── Insight cards ────────────────────────────────────────────────────── */
 .insight-card {
-  background: linear-gradient(135deg, #0c1021 0%, #13294B 100%);
+  background: linear-gradient(135deg, #1e2438 0%, #1e3560 100%);
   border-left: 3px solid var(--unc-blue);
   border-radius: 0 12px 12px 0;
   padding: 16px 20px;
@@ -80,11 +80,11 @@ section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6
 
 /* ── News cards ───────────────────────────────────────────────────────── */
 .news-card {
-  border: 1px solid #1a2540;
+  border: 1px solid #2a3050;
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 10px;
-  background: linear-gradient(135deg, #0c1021 0%, var(--bg-card) 100%);
+  background: linear-gradient(135deg, #1e2438 0%, var(--bg-card) 100%);
   transition: border-color 0.2s;
 }
 .news-card:hover { border-color: var(--unc-blue); }

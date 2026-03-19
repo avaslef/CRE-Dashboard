@@ -7,17 +7,10 @@ from helpers import (
     fetch_fred_series, fetch_fred_latest, fetch_fred_multi, fetch_reit_etf,
     api_key_warning, source_badge, render_glossary_expander,
     metric_card, insight_card, fig_download_btn,
-    load_css, render_sidebar,
+    load_css, render_sidebar, render_footer,
     FRED_KEY,
 )
 from charts import line_chart, area_chart
-
-st.set_page_config(
-    page_title="Capital Markets — CRE Intelligence",
-    page_icon="💰",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 load_css()
 render_sidebar()
@@ -159,9 +152,4 @@ insight_card([
     "The Fed's next move (cut or hold) will determine whether CRE transaction volume recovers in 2025–2026.",
 ])
 
-st.divider()
-st.markdown("""
-<div style="text-align:center;padding:8px 0;color:#475569;font-size:0.78em">
-  CRE Intelligence Dashboard &nbsp;·&nbsp; Data: FRED, U.S. Census, NewsAPI &nbsp;·&nbsp;
-  Built with Streamlit + Plotly &nbsp;·&nbsp; Alexander Vaslef
-</div>""", unsafe_allow_html=True)
+render_footer()

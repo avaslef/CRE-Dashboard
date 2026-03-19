@@ -8,15 +8,8 @@ from config import MARKET_TIERS, COLORS, PLOTLY_TEMPLATE
 from helpers import (
     fetch_fred_latest,
     fig_download_btn,
-    load_css, render_sidebar,
+    load_css, render_sidebar, render_footer,
     FRED_KEY,
-)
-
-st.set_page_config(
-    page_title="Interactive Map — CRE Intelligence",
-    page_icon="🗺️",
-    layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 load_css()
@@ -147,9 +140,4 @@ m.get_root().html.add_child(folium.Element(legend_html))
 with col_map:
     st_folium(m, width=900, height=550)
 
-st.divider()
-st.markdown("""
-<div style="text-align:center;padding:8px 0;color:#475569;font-size:0.78em">
-  CRE Intelligence Dashboard &nbsp;·&nbsp; Data: FRED, U.S. Census, NewsAPI &nbsp;·&nbsp;
-  Built with Streamlit + Plotly &nbsp;·&nbsp; Alexander Vaslef
-</div>""", unsafe_allow_html=True)
+render_footer()

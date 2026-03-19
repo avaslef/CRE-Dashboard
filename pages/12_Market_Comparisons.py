@@ -7,17 +7,10 @@ from helpers import (
     fetch_fred_multi,
     api_key_warning, source_badge,
     insight_card, df_download_btn, fig_download_btn,
-    load_css, render_sidebar,
+    load_css, render_sidebar, render_footer,
     FRED_KEY,
 )
 from charts import line_chart, box_chart
-
-st.set_page_config(
-    page_title="Market Comparisons — CRE Intelligence",
-    page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 load_css()
 render_sidebar()
@@ -121,9 +114,4 @@ insight_card([
     "Year-over-year changes in unemployment are a leading indicator of CRE demand shifts (positive = tightening market).",
 ])
 
-st.divider()
-st.markdown("""
-<div style="text-align:center;padding:8px 0;color:#475569;font-size:0.78em">
-  CRE Intelligence Dashboard &nbsp;·&nbsp; Data: FRED, U.S. Census, NewsAPI &nbsp;·&nbsp;
-  Built with Streamlit + Plotly &nbsp;·&nbsp; Alexander Vaslef
-</div>""", unsafe_allow_html=True)
+render_footer()

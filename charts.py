@@ -24,7 +24,7 @@ _AXIS_COMMON = dict(
 _LEGEND = dict(
     orientation="h",
     yanchor="top",
-    y=-0.15,          # legend BELOW chart — eliminates all title overlap
+    y=-0.28,          # pushed well below x-axis label so nothing overlaps
     xanchor="center",
     x=0.5,
     font=dict(size=11, color="#e2e8f0"),
@@ -34,7 +34,7 @@ _LEGEND = dict(
     itemsizing="constant",
     valign="middle",
 )
-_MARGIN = dict(l=48, r=16, t=56, b=72)  # extra bottom margin for legend
+_MARGIN = dict(l=48, r=16, t=56, b=120)  # tall bottom margin for legend + axis label
 _BG = "rgba(0,0,0,0)"
 _PAPER = "rgba(0,0,0,0)"
 

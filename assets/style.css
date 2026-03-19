@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── UNC Chapel Hill Color Tokens ─────────────────────────────────────── */
+:root {
+  --unc-blue: #4B9CD3;
+  --unc-navy: #13294B;
+  --unc-light: #7BAFD4;
+  --unc-white: #FFFFFF;
+  --bg-primary: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-end: #1a2640;
+  --border-subtle: rgba(75,156,211,0.15);
+  --border-hover: rgba(75,156,211,0.4);
+  --text-primary: #f1f5f9;
+  --text-secondary: #4B9CD3;
+  --text-muted: #7BAFD4;
+  --text-dim: #64748b;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+html, body, [class*="css"]  { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+.main { background: var(--bg-primary); }
+section[data-testid="stSidebar"] { background: #0c1021; border-right: 1px solid #1a2540; }
+section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6px 0; }
+
+/* ── Metric cards ─────────────────────────────────────────────────────── */
+.metric-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-end) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 120px;
+}
+.metric-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 24px rgba(75,156,211,0.1);
+}
+.metric-card h3 {
+  margin: 0 0 8px; font-size: 0.72em; font-weight: 600;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.2px;
+}
+.metric-card .value {
+  font-size: 1.7em; font-weight: 700; color: var(--text-primary);
+  margin: 0; line-height: 1.2; letter-spacing: -0.02em;
+}
+.metric-card .delta {
+  font-size: 0.76em; margin-top: 6px; color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* ── Section headers ──────────────────────────────────────────────────── */
+.section-header {
+  border-left: 3px solid var(--unc-blue);
+  padding-left: 14px;
+  margin: 28px 0 18px;
+}
+.section-header h1 {
+  font-size: 1.6rem !important; font-weight: 700; color: var(--unc-blue);
+  letter-spacing: -0.02em;
+}
+
+/* ── Tier badges ──────────────────────────────────────────────────────── */
+.badge-gateway  { background:#dc2626; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
+.badge-tier1    { background:#d97706; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
+.badge-tier2    { background:#059669; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
+.badge-triangle { background:var(--unc-blue); color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
+
+/* ── Insight cards ────────────────────────────────────────────────────── */
+.insight-card {
+  background: linear-gradient(135deg, #0c1021 0%, #13294B 100%);
+  border-left: 3px solid var(--unc-blue);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 20px;
+  margin: 14px 0;
+}
+.insight-card b { color: var(--unc-blue); }
+.insight-card li { color: #cbd5e1; margin-bottom: 4px; font-size: 0.9em; line-height: 1.55; }
+
+/* ── News cards ───────────────────────────────────────────────────────── */
+.news-card {
+  border: 1px solid #1a2540;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #0c1021 0%, var(--bg-card) 100%);
+  transition: border-color 0.2s;
+}
+.news-card:hover { border-color: var(--unc-blue); }
+.news-card a { color: var(--unc-blue); text-decoration: none; font-weight: 600; }
+.news-card a:hover { text-decoration: underline; color: var(--unc-light); }
+.news-card .meta { color: var(--text-dim); font-size: 0.8em; margin-top: 2px; }
+.news-card .desc { color: #94a3b8; font-size: 0.86em; margin-top: 6px; line-height: 1.5; }
+
+/* ── Source badges ────────────────────────────────────────────────────── */
+.source-link { font-size: 0.78em; color: var(--text-dim); }
+.source-link a { color: var(--unc-blue); }
+
+/* ── Data tables ──────────────────────────────────────────────────────── */
+.stDataFrame { border-radius: 10px; overflow: hidden; }
+
+/* ── Dividers ─────────────────────────────────────────────────────────── */
+hr { border-color: #1a2540 !important; margin: 20px 0; }
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.stDownloadButton > button {
+  background: transparent; border: 1px solid #2a3a55; color: var(--text-muted);
+  font-size: 0.8em; border-radius: 8px; padding: 4px 14px;
+}
+.stDownloadButton > button:hover {
+  border-color: var(--unc-blue); color: var(--text-primary);
+}
+
+/* ── Sidebar polish ───────────────────────────────────────────────────── */
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 0 8px; margin-bottom: 4px;
+}
+.sidebar-brand .logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--unc-blue) 0%, var(--unc-navy) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: white; flex-shrink: 0;
+}
+.sidebar-brand .title {
+  font-size: 1.05rem; font-weight: 700; color: var(--text-primary);
+  line-height: 1.2;
+}
+.sidebar-brand .subtitle {
+  font-size: 0.72rem; color: var(--unc-blue); font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.api-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.api-dot.on  { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.4); }
+.api-dot.off { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.3); }
+
+/* ── Streamlit overrides ──────────────────────────────────────────────── */
+.stSubheader, h2, h3 { color: var(--unc-blue) !important; }
+.stMarkdown p { color: var(--unc-blue); }
+.stCaption p { color: #94a3b8; }
+
+/* ── Sidebar text — white for readability on navy ────────────────────── */
+section[data-testid="stSidebar"] label span,
+section[data-testid="stSidebar"] .stRadio label,
+section[data-testid="stSidebar"] .stMarkdown p,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+  color: #e2e8f0 !important;
+}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
+  color: #ffffff !important;
+}
+
+/* ── Hide default Streamlit chrome ────────────────────────────────────── */
+#MainMenu { visibility: hidden; }
+header[data-testid="stHeader"] { background: rgba(11,15,25,0.85); backdrop-filter: blur(12px); }
+footer { visibility: hidden; }

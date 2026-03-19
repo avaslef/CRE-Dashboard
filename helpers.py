@@ -2,10 +2,12 @@
 # ----------------------------------------------------------
 from __future__ import annotations
 
+import html as _html
 import os
 import requests
 import pandas as pd
 import streamlit as st
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 from typing import Optional
 from dotenv import load_dotenv
@@ -39,8 +41,11 @@ def fetch_fred_series(series_id: str, start: str = "2010-01-01") -> pd.DataFrame
         df["date"] = pd.to_datetime(df["date"])
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
         return df.dropna(subset=["value"])
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching FRED series {series_id}: {e}")
+        return pd.DataFrame(columns=["date", "value"])
     except Exception:
-        # Silently return empty — bad series IDs are common for metro-level data
+        # Silently return empty — bad/missing series IDs are common for metro-level data
         return pd.DataFrame(columns=["date", "value"])
 
 
@@ -240,7 +245,8 @@ def fetch_google_trends(keywords: list, timeframe: str = "today 5-y",
         df = df.drop(columns=["isPartial"], errors="ignore")
         df.index.name = "date"
         return df.reset_index()
-    except Exception:
+    except Exception as e:
+        st.warning(f"Google Trends fetch failed (rate limiting is common): {e}")
         return pd.DataFrame()
 
 
@@ -255,7 +261,8 @@ def fetch_google_trends_by_region(keyword: str, timeframe: str = "today 5-y",
         df = pytrends.interest_by_region(resolution="REGION", inc_low_vol=True, inc_geo_code=True)
         df = df.reset_index()
         return df
-    except Exception:
+    except Exception as e:
+        st.warning(f"Google Trends by-region fetch failed: {e}")
         return pd.DataFrame()
 
 
@@ -279,7 +286,11 @@ def fetch_zillow_data(dataset: str = "zhvi_metro") -> pd.DataFrame:
     try:
         df = pd.read_csv(url, low_memory=False)
         return df
-    except Exception:
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching Zillow dataset '{dataset}': {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        st.warning(f"Error loading Zillow dataset '{dataset}': {e}")
         return pd.DataFrame()
 
 
@@ -374,7 +385,11 @@ def fetch_bea_gdp_metro() -> pd.DataFrame:
         df["DataValue"] = pd.to_numeric(df["DataValue"].str.replace(",", ""), errors="coerce")
         df = df.rename(columns={"GeoName": "Metro", "TimePeriod": "Year", "DataValue": "GDP_thousands"})
         return df[["Metro", "Year", "GDP_thousands"]].dropna()
-    except Exception:
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching BEA GDP data: {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        st.warning(f"Error parsing BEA GDP data: {e}")
         return pd.DataFrame()
 
 
@@ -404,7 +419,11 @@ def fetch_bea_personal_income_metro() -> pd.DataFrame:
         df["DataValue"] = pd.to_numeric(df["DataValue"].str.replace(",", ""), errors="coerce")
         df = df.rename(columns={"GeoName": "Metro", "TimePeriod": "Year", "DataValue": "PerCapitaIncome"})
         return df[["Metro", "Year", "PerCapitaIncome"]].dropna()
-    except Exception:
+    except requests.exceptions.RequestException as e:
+        st.warning(f"Network error fetching BEA personal income data: {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        st.warning(f"Error parsing BEA personal income data: {e}")
         return pd.DataFrame()
 
 
@@ -460,20 +479,115 @@ def render_glossary_expander(terms: list[str], glossary: dict):
 
 
 def source_badge(label: str, url: str):
-    st.markdown(f'<p class="source-link">Source: <a href="{url}" target="_blank">{label}</a></p>',
-                unsafe_allow_html=True)
+    st.markdown(
+        f'<p class="source-link">Source: <a href="{url}" target="_blank" rel="noopener noreferrer">'
+        f'{_html.escape(label)}</a></p>',
+        unsafe_allow_html=True,
+    )
 
 
 def news_card(article: dict):
     """Render a single news article as a styled card."""
-    title  = article.get("title", "No title")
-    desc   = article.get("description", "")
+    title  = _html.escape(article.get("title", "No title"))
+    desc   = _html.escape(article.get("description") or "")
     link   = article.get("url", "#")
-    source = article.get("source", {}).get("name", "Unknown")
-    pub    = article.get("publishedAt", "")[:10]
+    source = _html.escape(article.get("source", {}).get("name", "Unknown"))
+    pub    = _html.escape(article.get("publishedAt", "")[:10])
     st.markdown(f"""
 <div class="news-card">
-  <a href="{link}" target="_blank">{title}</a>
+  <a href="{link}" target="_blank" rel="noopener noreferrer">{title}</a>
   <div class="meta">{source} &nbsp;·&nbsp; {pub}</div>
-  <div class="desc">{desc or ''}</div>
+  <div class="desc">{desc}</div>
 </div>""", unsafe_allow_html=True)
+
+
+# ── Shared UI components (used by all pages) ──────────────────────────────────
+
+def load_css():
+    """Inject the shared stylesheet from assets/style.css."""
+    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "style.css")
+    if os.path.exists(css_path):
+        with open(css_path) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+def render_sidebar():
+    """Render the shared sidebar brand, controls, API status, and glossary."""
+    from config import GLOSSARY
+    with st.sidebar:
+        st.markdown("""
+    <div class="sidebar-brand">
+      <div class="logo">🏢</div>
+      <div>
+        <div class="title">CRE Intelligence</div>
+        <div class="subtitle">Commercial Real Estate Dashboard</div>
+      </div>
+    </div>""", unsafe_allow_html=True)
+        st.divider()
+
+        if st.button("🔄 Refresh All Data", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+
+        st.caption(last_updated_badge())
+        st.divider()
+
+        fred_dot   = "on" if FRED_KEY   else "off"
+        census_dot = "on" if CENSUS_KEY else "off"
+        news_dot   = "on" if NEWS_KEY   else "off"
+        bea_dot    = "on" if BEA_KEY    else "off"
+        st.markdown(f"""
+    <div style="font-size:0.82em; color:#94a3b8; line-height:2">
+      <b style="color:#cbd5e1">Data Connections</b><br>
+      <span class="api-dot {fred_dot}"></span> FRED (St. Louis Fed)<br>
+      <span class="api-dot {census_dot}"></span> U.S. Census Bureau<br>
+      <span class="api-dot {news_dot}"></span> NewsAPI.org<br>
+      <span class="api-dot {bea_dot}"></span> BEA (optional)<br>
+      <span class="api-dot on"></span> Google Trends (no key)<br>
+      <span class="api-dot on"></span> Zillow Research (no key)
+    </div>""", unsafe_allow_html=True)
+        st.divider()
+
+        with st.expander("📖 CRE Glossary"):
+            for term, defn in GLOSSARY.items():
+                st.markdown(f"**{term}:** {defn}")
+
+
+def metric_card(title: str, value: str, delta: str = "", icon: str = ""):
+    st.markdown(f"""
+<div class="metric-card">
+  <h3>{icon} {title}</h3>
+  <p class="value">{value}</p>
+  <p class="delta">{delta}</p>
+</div>""", unsafe_allow_html=True)
+
+
+def insight_card(bullets: list[str]):
+    items = "".join(f"<li>{b}</li>" for b in bullets)
+    st.markdown(f"""
+<div class="insight-card">
+  <b>💡 Key Insights</b>
+  <ul style="margin:8px 0 0;padding-left:18px;color:#cdd6e0">{items}</ul>
+</div>""", unsafe_allow_html=True)
+
+
+def tier_badge(tier: str) -> str:
+    mapping = {
+        "Gateway":           '<span class="badge-gateway">Gateway</span>',
+        "Tier 1":            '<span class="badge-tier1">Tier 1</span>',
+        "Tier 2 / Emerging": '<span class="badge-tier2">Tier 2/Emerging</span>',
+    }
+    return mapping.get(tier, tier)
+
+
+def df_download_btn(df: "pd.DataFrame", filename: str, label: str = "⬇ Export CSV"):
+    csv = df.to_csv(index=False)
+    st.download_button(label, csv, file_name=filename, mime="text/csv")
+
+
+def fig_download_btn(fig: "go.Figure", filename: str, label: str = "⬇ Export PNG"):
+    try:
+        img_bytes = fig.to_image(format="png", width=1200, height=600)
+        st.download_button(label, img_bytes, file_name=filename, mime="image/png")
+    except Exception:
+        st.caption("Install `kaleido` for PNG export: `pip install kaleido`")

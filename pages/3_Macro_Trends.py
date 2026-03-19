@@ -4,7 +4,7 @@ import streamlit as st
 
 from config import NATIONAL_SERIES, COLORS, GLOSSARY
 from helpers import (
-    fetch_fred_series, fetch_fred_multi, fetch_reit_etf,
+    fetch_fred_series, fetch_fred_multi, fetch_reit_etf, fetch_google_trends,
     api_key_warning, source_badge, render_glossary_expander,
     insight_card, fig_download_btn,
     load_css, render_sidebar, render_footer,
@@ -115,6 +115,112 @@ if not df_vnq.empty:
     fig_download_btn(fig, "vnq_reit.png")
 else:
     st.info("Install `yfinance` for REIT proxy data: `pip install yfinance`")
+
+st.divider()
+
+# ── "Can't Sell House" Index ──────────────────────────────────────────────
+st.subheader("🏚️ The 'Can't Sell House' Index (CSHI)")
+st.caption("A tongue-in-cheek — but surprisingly useful — leading indicator of housing market stress.")
+
+_CSHI_TERMS = [
+    "can't sell house",
+    "house won't sell",
+    "price reduction home",
+    "how long to sell house",
+]
+
+with st.spinner("Fetching search trend data..."):
+    df_cshi = fetch_google_trends(_CSHI_TERMS, timeframe="today 5-y", geo="US")
+
+if not df_cshi.empty:
+    df_cshi = df_cshi.copy()
+
+    # Average raw interest across all terms (0–100 Google scale)
+    term_cols = [c for c in df_cshi.columns if c != "date"]
+    df_cshi["raw_avg"] = df_cshi[term_cols].mean(axis=1)
+
+    # Normalize to index centered at 50 (period mean = 50)
+    period_mean = df_cshi["raw_avg"].mean()
+    if period_mean > 0:
+        df_cshi["CSHI"] = (df_cshi["raw_avg"] / period_mean) * 50
+    else:
+        df_cshi["CSHI"] = 50.0
+
+    # 4-week rolling average to smooth noise
+    df_cshi["CSHI_smooth"] = df_cshi["CSHI"].rolling(4, min_periods=1).mean()
+
+    from charts import line_chart
+    fig_cshi = line_chart(
+        df_cshi, "date", "CSHI_smooth",
+        "Can't Sell House Index (CSHI) — 4-Week Rolling Avg", "CSHI"
+    )
+    fig_cshi.add_hrect(y0=0,  y1=40, fillcolor="rgba(52,211,153,0.06)",  line_width=0)
+    fig_cshi.add_hrect(y0=60, y1=200, fillcolor="rgba(248,113,113,0.06)", line_width=0)
+    fig_cshi.add_hline(y=50, line_dash="dot",
+                       line_color="rgba(148,163,184,0.4)", line_width=1)
+    fig_cshi.add_annotation(x=0.01, xref="paper", xanchor="left", y=50,
+                            text="Neutral (50)", showarrow=False,
+                            font=dict(color="#94a3b8", size=9),
+                            bgcolor="rgba(11,15,25,0.8)", borderpad=2)
+    fig_cshi.add_annotation(x=0.01, xref="paper", xanchor="left", y=30,
+                            text="Seller confidence ↑", showarrow=False,
+                            font=dict(color="#34d399", size=9),
+                            bgcolor="rgba(11,15,25,0.8)", borderpad=2)
+    fig_cshi.add_annotation(x=0.01, xref="paper", xanchor="left", y=68,
+                            text="Seller stress ↑", showarrow=False,
+                            font=dict(color="#f87171", size=9),
+                            bgcolor="rgba(11,15,25,0.8)", borderpad=2)
+    st.plotly_chart(fig_cshi, use_container_width=True)
+    fig_download_btn(fig_cshi, "cshi.png")
+
+    latest_cshi = df_cshi["CSHI_smooth"].dropna().iloc[-1]
+    if latest_cshi >= 65:
+        signal, color = "🔴 Elevated — Buyer's market signals", "#f87171"
+    elif latest_cshi >= 50:
+        signal, color = "🟡 Above neutral — Some seller pressure", "#fbbf24"
+    elif latest_cshi >= 35:
+        signal, color = "🟢 Below neutral — Healthy seller confidence", "#34d399"
+    else:
+        signal, color = "🟢 Low — Strong seller's market", "#34d399"
+
+    st.markdown(
+        f"**Current CSHI: <span style='color:{color}'>{latest_cshi:.1f}</span> — {signal}**",
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("📐 Methodology & Formula"):
+        st.markdown("""
+**The Can't Sell House Index (CSHI)** aggregates Google Trends search interest for four related
+distress signals — *"can't sell house"*, *"house won't sell"*, *"price reduction home"*, and
+*"how long to sell house"* — into a single normalized index, scaled like a traditional economic indicator.
+
+**Formula:**
+
+```
+raw_avg(t)  = mean(interest_score_term_1..4 at week t)   # 0–100 Google scale
+period_mean = mean(raw_avg over the full 5-year window)
+CSHI(t)     = (raw_avg(t) / period_mean) × 50            # centered at 50
+CSHI_smooth = 4-week rolling average of CSHI(t)
+```
+
+**Reading the index:**
+| CSHI Range | Signal |
+|---|---|
+| < 35 | Strong seller's market — low anxiety, homes moving quickly |
+| 35–50 | Below-neutral — healthy conditions, mild seller confidence |
+| 50–65 | Above-neutral — some seller stress, softening demand |
+| > 65 | Elevated distress — buyer's market, price cuts likely |
+
+**Why it works (sort of):** Search behavior tends to lead formal housing data by 4–8 weeks.
+When sellers start Googling "why won't my house sell," days-on-market is already rising.
+It's not the Fed Beige Book — but it's free, real-time, and has a great name.
+
+*Inspired by the Big Mac Index (The Economist), the Pentagon Pizza Meter, and the
+Skyscraper Index. Use accordingly.*
+        """)
+    source_badge("Google Trends via pytrends", "https://trends.google.com")
+else:
+    st.info("Google Trends data unavailable — install `pytrends` or check rate limits.")
 
 st.divider()
 insight_card([

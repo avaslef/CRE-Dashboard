@@ -6,7 +6,7 @@ from config import MARKET_TIERS, NATIONAL_SERIES, COLORS, GLOSSARY
 from helpers import (
     fetch_fred_series, fetch_fred_latest, fetch_fred_multi,
     api_key_warning, source_badge, render_glossary_expander,
-    metric_card, insight_card, tier_badge, fig_download_btn,
+    metric_card, insight_card, fig_download_btn,
     load_css, render_sidebar, render_footer,
     FRED_KEY,
 )
@@ -100,9 +100,10 @@ st.divider()
 
 # ── Row 3: market tier summary cards ──────────────────────────────────────
 st.subheader("Market Tier Summary")
+_TIER_EMOJI = {"Gateway": "🔴", "Tier 1": "🟠", "Tier 2 / Emerging": "🟢"}
 for tier_name, tier_data in MARKET_TIERS.items():
-    with st.expander(f"{tier_badge(tier_name)}  **{tier_name}** — {len(tier_data['markets'])} markets",
-                     expanded=(tier_name == "Tier 2 / Emerging")):
+    _label = f"{_TIER_EMOJI.get(tier_name, '●')} {tier_name} — {len(tier_data['markets'])} markets"
+    with st.expander(_label, expanded=(tier_name == "Tier 2 / Emerging")):
         cols = st.columns(min(4, len(tier_data["markets"])))
         for i, mkt in enumerate(tier_data["markets"]):
             with cols[i % 4]:

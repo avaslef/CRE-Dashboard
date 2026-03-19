@@ -542,16 +542,6 @@ def render_sidebar():
     """Render the shared sidebar brand, controls, API status, and glossary."""
     from config import GLOSSARY
     with st.sidebar:
-        st.markdown("""
-    <div class="sidebar-brand">
-      <div class="logo">🏢</div>
-      <div>
-        <div class="title">CRE Intelligence</div>
-        <div class="subtitle">Commercial Real Estate Dashboard</div>
-      </div>
-    </div>""", unsafe_allow_html=True)
-        st.divider()
-
         if st.button("🔄 Refresh All Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()

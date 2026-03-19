@@ -18,6 +18,17 @@ st.set_page_config(
 
 load_css()
 
+# Brand block — added here so CSS flex-order can hoist it above the nav
+with st.sidebar:
+    st.markdown("""
+<div class="sidebar-brand">
+  <div class="logo">🏢</div>
+  <div>
+    <div class="title">CRE Intelligence</div>
+    <div class="subtitle">Commercial Real Estate Dashboard</div>
+  </div>
+</div>""", unsafe_allow_html=True)
+
 pg = st.navigation(
     {
         "Market Analysis": [

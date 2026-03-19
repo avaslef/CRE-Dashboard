@@ -1,27 +1,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── UNC Chapel Hill Color Tokens ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNC Chapel Hill Official Brand Palette
+   Carolina Blue  #4B9CD3  |  Navy  #13294B  |  Black  #151515  |  White  #FFFFFF
+   Digital Links  #007FAE
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --unc-blue: #4B9CD3;
-  --unc-navy: #13294B;
-  --unc-light: #7BAFD4;
-  --unc-white: #FFFFFF;
-  --bg-primary: #1e2235;
-  --bg-card: #252b40;
-  --bg-card-end: #2d3455;
-  --border-subtle: rgba(75,156,211,0.18);
-  --border-hover: rgba(75,156,211,0.45);
-  --text-primary: #f1f5f9;
-  --text-secondary: #4B9CD3;
-  --text-muted: #7BAFD4;
-  --text-dim: #8899aa;
+  /* Official UNC colors */
+  --unc-blue:      #4B9CD3;   /* Carolina Blue */
+  --unc-navy:      #13294B;   /* Navy */
+  --unc-black:     #151515;   /* Black */
+  --unc-white:     #FFFFFF;   /* White */
+  --unc-blue-link: #007FAE;   /* Digital links */
+
+  /* Derived navy-family backgrounds (all anchored to UNC Navy) */
+  --bg-primary:  #13294B;     /* Main content — pure UNC Navy */
+  --bg-card:     #1a3660;     /* Cards — navy lightened toward blue */
+  --bg-card-end: #1e4070;     /* Card gradient end */
+
+  /* Borders — Carolina Blue with transparency */
+  --border-subtle: rgba(75, 156, 211, 0.22);
+  --border-hover:  rgba(75, 156, 211, 0.60);
+
+  /* Text hierarchy on dark navy */
+  --text-primary:   #FFFFFF;   /* White — headings, values */
+  --text-secondary: #4B9CD3;   /* Carolina Blue — labels, accents */
+  --text-muted:     #7BAFD4;   /* Lightened Carolina Blue — secondary text */
+  --text-dim:       #9ab5d0;   /* Muted — captions, metadata */
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
-html, body, [class*="css"]  { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+html, body, [class*="css"] {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+/* UNC Black for the outer app shell (visible as dark strips in the screenshot) */
+.stApp, body { background-color: var(--unc-black) !important; }
+/* UNC Navy for the main scrollable content area */
 .main { background: var(--bg-primary); }
-section[data-testid="stSidebar"] { background: #191e30; border-right: 1px solid #2a3050; }
+
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
+section[data-testid="stSidebar"] {
+  background: #0f2040;   /* slightly darker than navy — creates depth vs. main */
+  border-right: 1px solid rgba(75, 156, 211, 0.25);
+}
 section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6px 0; }
+
+/* Hoist sidebar brand block above the st.navigation() nav list */
+div[data-testid="stSidebarContent"] {
+  display: flex !important;
+  flex-direction: column !important;
+}
+nav[data-testid="stSidebarNav"] { order: 2; }
+div[data-testid="stSidebarContent"] > div[data-testid="stVerticalBlock"] { order: 1; }
 
 /* ── Metric cards ─────────────────────────────────────────────────────── */
 .metric-card {
@@ -35,7 +65,7 @@ section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6
 }
 .metric-card:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 4px 24px rgba(75,156,211,0.1);
+  box-shadow: 0 4px 24px rgba(75, 156, 211, 0.15);
 }
 .metric-card h3 {
   margin: 0 0 8px; font-size: 0.72em; font-weight: 600;
@@ -46,8 +76,7 @@ section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6
   margin: 0; line-height: 1.2; letter-spacing: -0.02em;
 }
 .metric-card .delta {
-  font-size: 0.76em; margin-top: 6px; color: #94a3b8;
-  line-height: 1.4;
+  font-size: 0.76em; margin-top: 6px; color: var(--text-dim); line-height: 1.4;
 }
 
 /* ── Section headers ──────────────────────────────────────────────────── */
@@ -57,62 +86,64 @@ section[data-testid="stSidebar"] .stRadio label { font-size: 0.88rem; padding: 6
   margin: 28px 0 18px;
 }
 .section-header h1 {
-  font-size: 1.6rem !important; font-weight: 700; color: var(--unc-blue);
-  letter-spacing: -0.02em;
+  font-size: 1.6rem !important; font-weight: 700;
+  color: var(--unc-blue); letter-spacing: -0.02em;
 }
 
 /* ── Tier badges ──────────────────────────────────────────────────────── */
-.badge-gateway  { background:#dc2626; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
-.badge-tier1    { background:#d97706; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
-.badge-tier2    { background:#059669; color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
-.badge-triangle { background:var(--unc-blue); color:#fff; border-radius:6px; padding:3px 10px; font-size:0.72em; font-weight:600; letter-spacing:0.5px; }
+.badge-gateway  { background: #b91c1c; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 0.72em; font-weight: 600; letter-spacing: 0.5px; }
+.badge-tier1    { background: #b45309; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 0.72em; font-weight: 600; letter-spacing: 0.5px; }
+.badge-tier2    { background: #047857; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 0.72em; font-weight: 600; letter-spacing: 0.5px; }
+.badge-triangle { background: var(--unc-blue); color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 0.72em; font-weight: 600; letter-spacing: 0.5px; }
 
 /* ── Insight cards ────────────────────────────────────────────────────── */
 .insight-card {
-  background: linear-gradient(135deg, #1e2438 0%, #1e3560 100%);
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-end) 100%);
   border-left: 3px solid var(--unc-blue);
   border-radius: 0 12px 12px 0;
   padding: 16px 20px;
   margin: 14px 0;
 }
-.insight-card b { color: var(--unc-blue); }
-.insight-card li { color: #cbd5e1; margin-bottom: 4px; font-size: 0.9em; line-height: 1.55; }
+.insight-card b   { color: var(--unc-blue); }
+.insight-card li  { color: #cde0f5; margin-bottom: 4px; font-size: 0.9em; line-height: 1.55; }
 
 /* ── News cards ───────────────────────────────────────────────────────── */
 .news-card {
-  border: 1px solid #2a3050;
+  border: 1px solid rgba(75, 156, 211, 0.2);
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 10px;
-  background: linear-gradient(135deg, #1e2438 0%, var(--bg-card) 100%);
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-end) 100%);
   transition: border-color 0.2s;
 }
 .news-card:hover { border-color: var(--unc-blue); }
-.news-card a { color: var(--unc-blue); text-decoration: none; font-weight: 600; }
-.news-card a:hover { text-decoration: underline; color: var(--unc-light); }
+.news-card a     { color: var(--unc-blue); text-decoration: none; font-weight: 600; }
+.news-card a:hover { text-decoration: underline; color: var(--text-muted); }
 .news-card .meta { color: var(--text-dim); font-size: 0.8em; margin-top: 2px; }
-.news-card .desc { color: #94a3b8; font-size: 0.86em; margin-top: 6px; line-height: 1.5; }
+.news-card .desc { color: var(--text-muted); font-size: 0.86em; margin-top: 6px; line-height: 1.5; }
 
 /* ── Source badges ────────────────────────────────────────────────────── */
-.source-link { font-size: 0.78em; color: var(--text-dim); }
-.source-link a { color: var(--unc-blue); }
+.source-link   { font-size: 0.78em; color: var(--text-dim); }
+.source-link a { color: var(--unc-blue-link); }
 
 /* ── Data tables ──────────────────────────────────────────────────────── */
 .stDataFrame { border-radius: 10px; overflow: hidden; }
 
 /* ── Dividers ─────────────────────────────────────────────────────────── */
-hr { border-color: #1a2540 !important; margin: 20px 0; }
+hr { border-color: rgba(75, 156, 211, 0.2) !important; margin: 20px 0; }
 
 /* ── Buttons ──────────────────────────────────────────────────────────── */
 .stDownloadButton > button {
-  background: transparent; border: 1px solid #2a3a55; color: var(--text-muted);
+  background: transparent;
+  border: 1px solid rgba(75, 156, 211, 0.35);
+  color: var(--text-muted);
   font-size: 0.8em; border-radius: 8px; padding: 4px 14px;
 }
 .stDownloadButton > button:hover {
   border-color: var(--unc-blue); color: var(--text-primary);
 }
 
-/* ── Sidebar polish ───────────────────────────────────────────────────── */
+/* ── Sidebar brand ────────────────────────────────────────────────────── */
 .sidebar-brand {
   display: flex; align-items: center; gap: 10px;
   padding: 4px 0 8px; margin-bottom: 4px;
@@ -124,35 +155,38 @@ hr { border-color: #1a2540 !important; margin: 20px 0; }
   font-size: 18px; color: white; flex-shrink: 0;
 }
 .sidebar-brand .title {
-  font-size: 1.05rem; font-weight: 700; color: var(--text-primary);
-  line-height: 1.2;
+  font-size: 1.05rem; font-weight: 700; color: var(--unc-white); line-height: 1.2;
 }
 .sidebar-brand .subtitle {
-  font-size: 0.72rem; color: var(--unc-blue); font-weight: 500;
-  letter-spacing: 0.3px;
+  font-size: 0.72rem; color: var(--unc-blue); font-weight: 500; letter-spacing: 0.3px;
 }
-.api-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-.api-dot.on  { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.4); }
-.api-dot.off { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.3); }
 
-/* ── Streamlit overrides ──────────────────────────────────────────────── */
+/* ── API status dots ──────────────────────────────────────────────────── */
+.api-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.api-dot.on  { background: #34d399; box-shadow: 0 0 6px rgba(52, 211, 153, 0.4); }
+.api-dot.off { background: #ef4444; box-shadow: 0 0 6px rgba(239,  68,  68, 0.3); }
+
+/* ── Streamlit text overrides ─────────────────────────────────────────── */
 .stSubheader, h2, h3 { color: var(--unc-blue) !important; }
 .stMarkdown p { color: var(--unc-blue); }
-.stCaption p { color: #94a3b8; }
+.stCaption p  { color: var(--text-dim); }
 
-/* ── Sidebar text — white for readability on navy ────────────────────── */
+/* ── Sidebar text — white for readability on deep navy ───────────────── */
 section[data-testid="stSidebar"] label span,
 section[data-testid="stSidebar"] .stRadio label,
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-  color: #e2e8f0 !important;
+  color: #dce8f5 !important;
 }
 section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
-  color: #ffffff !important;
+  color: var(--unc-white) !important;
 }
 
 /* ── Hide default Streamlit chrome ────────────────────────────────────── */
 #MainMenu { visibility: hidden; }
-header[data-testid="stHeader"] { background: rgba(11,15,25,0.85); backdrop-filter: blur(12px); }
+header[data-testid="stHeader"] {
+  background: rgba(15, 32, 64, 0.90);
+  backdrop-filter: blur(12px);
+}
 footer { visibility: hidden; }

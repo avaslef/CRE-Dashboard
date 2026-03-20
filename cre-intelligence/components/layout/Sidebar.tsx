@@ -55,13 +55,12 @@ export function Sidebar({ isOpen, onToggle, onNavClick }: SidebarProps) {
   const pathname = usePathname();
 
   return (
+    <div style={{ position: "relative", height: "100%", flexShrink: 0 }}>
     <motion.aside
       animate={{ width: isOpen ? 240 : 60 }}
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       style={{
-        position: "relative",
-        zIndex: 10,
-        flexShrink: 0,
+        height: "100%",
         background: "rgba(5,5,10,0.8)",
         backdropFilter: "blur(20px)",
         borderRight: "1px solid rgba(0,245,255,0.08)",
@@ -246,39 +245,41 @@ export function Sidebar({ isOpen, onToggle, onNavClick }: SidebarProps) {
         )}
       </AnimatePresence>
 
-      {/* Toggle button */}
-      <button
-        onClick={onToggle}
-        style={{
-          position: "absolute",
-          right: -12,
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: 24,
-          height: 24,
-          borderRadius: "50%",
-          background: "rgba(5,5,10,0.95)",
-          border: "1px solid rgba(0,245,255,0.25)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          zIndex: 20,
-          boxShadow: "0 0 12px rgba(0,245,255,0.1)",
-          transition: "box-shadow 0.2s",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 20px rgba(0,245,255,0.3)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 12px rgba(0,245,255,0.1)";
-        }}
-      >
-        {isOpen
-          ? <ChevronLeft size={12} color="#00f5ff" />
-          : <ChevronRight size={12} color="#00f5ff" />
-        }
-      </button>
     </motion.aside>
+
+    {/* Toggle button — lives on the wrapper so it's never clipped */}
+    <button
+      onClick={onToggle}
+      style={{
+        position: "absolute",
+        right: -12,
+        top: "50%",
+        transform: "translateY(-50%)",
+        width: 24,
+        height: 24,
+        borderRadius: "50%",
+        background: "rgba(5,5,10,0.95)",
+        border: "1px solid rgba(0,245,255,0.25)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        zIndex: 20,
+        boxShadow: "0 0 12px rgba(0,245,255,0.1)",
+        transition: "box-shadow 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 20px rgba(0,245,255,0.3)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 12px rgba(0,245,255,0.1)";
+      }}
+    >
+      {isOpen
+        ? <ChevronLeft size={12} color="#00f5ff" />
+        : <ChevronRight size={12} color="#00f5ff" />
+      }
+    </button>
+    </div>
   );
 }

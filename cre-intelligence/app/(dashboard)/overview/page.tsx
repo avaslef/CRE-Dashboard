@@ -57,14 +57,22 @@ export default function OverviewPage() {
       setCreHistory(cre);
       setRatesHistory(rates);
 
-      // Fetch unemployment for all markets
+      // Fetch unemployment for all markets — batched to avoid FRED rate limiting
       const allMarkets = Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
         data.markets.map((m: (typeof data.markets)[number]) => ({ ...m, tier }))
       );
-      const unempResults = await Promise.all(
-        allMarkets.map((m) => fetchFredLatest(m.fredUnemp).then((v) => [m.name, v] as const))
-      );
-      setTierUnemp(Object.fromEntries(unempResults));
+      const BATCH = 6;
+      const unempEntries: [string, number | null][] = [];
+      for (let i = 0; i < allMarkets.length; i += BATCH) {
+        const batch = await Promise.all(
+          allMarkets.slice(i, i + BATCH).map((m) =>
+            fetchFredLatest(m.fredUnemp).then((v) => [m.name, v] as [string, number | null])
+          )
+        );
+        unempEntries.push(...batch);
+        if (i + BATCH < allMarkets.length) await new Promise((r) => setTimeout(r, 250));
+      }
+      setTierUnemp(Object.fromEntries(unempEntries));
       setLoading(false);
     }
     load();

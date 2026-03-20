@@ -146,7 +146,16 @@ export function BarChart({
             </>
           ) : (
             <>
-              <XAxis dataKey={xKey} tick={{ fill: "#4a6380", fontSize: 10 }} axisLine={{ stroke: "rgba(255,255,255,0.06)" }} tickLine={false} />
+              <XAxis
+                dataKey={xKey}
+                tick={{ fill: "#8fa3b8", fontSize: 9 }}
+                axisLine={{ stroke: "rgba(255,255,255,0.06)" }}
+                tickLine={false}
+                angle={-40}
+                textAnchor="end"
+                interval={0}
+                height={90}
+              />
               <YAxis tick={{ fill: "#4a6380", fontSize: 10 }} axisLine={false} tickLine={false} />
             </>
           )}

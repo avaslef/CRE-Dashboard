@@ -30,15 +30,24 @@ export default function MarketTiersPage() {
         data.markets.map((m: (typeof data.markets)[number]) => ({ ...m, tier, color: data.color, highlight: !!m.highlight }))
       );
 
-      const withUnemp = await Promise.all(
-        allMarkets.map(async (m) => ({
-          name: m.name,
-          unemp: await fetchFredLatest(m.fredUnemp),
-          tier: m.tier,
-          color: m.color,
-          highlight: m.highlight,
-        }))
-      );
+      // Batch in groups of 6 to avoid FRED rate limiting
+      const BATCH = 6;
+      const withUnemp: MarketData[] = [];
+      for (let i = 0; i < allMarkets.length; i += BATCH) {
+        const batch = await Promise.all(
+          allMarkets.slice(i, i + BATCH).map(async (m) => ({
+            name: m.name,
+            unemp: await fetchFredLatest(m.fredUnemp),
+            tier: m.tier,
+            color: m.color,
+            highlight: m.highlight,
+          }))
+        );
+        withUnemp.push(...batch);
+        if (i + BATCH < allMarkets.length) {
+          await new Promise((r) => setTimeout(r, 250));
+        }
+      }
       setMarkets(withUnemp);
       setLoading(false);
     }
@@ -113,14 +122,12 @@ export default function MarketTiersPage() {
         <div style={{ marginBottom: 28 }}>
           <BarChart
             data={chartData}
-            xKey="Unemployment"
-            yKey="Market"
+            xKey="Market"
+            yKey="Unemployment"
             title="Unemployment Rate by Market (%)"
-            orientation="horizontal"
             colorKey="Tier"
             colorMap={tierColorMap}
-            height={Math.max(400, chartData.length * 28)}
-            yAxisWidth={160}
+            height={340}
             showLabels
             exportFilename="market_unemployment.csv"
           />

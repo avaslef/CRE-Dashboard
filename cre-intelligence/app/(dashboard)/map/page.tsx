@@ -70,7 +70,7 @@ export default function MapPage() {
       <InteractiveMap focusTriangle={focusTriangle} height={560} />
 
       {/* Market count cards below map */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginTop: 20 }}>
+      <div className="kpi-grid-3" style={{ marginTop: 20, marginBottom: 0 }}>
         {Object.entries(MARKET_TIERS).map(([tier, data]) => (
           <motion.div
             key={tier}

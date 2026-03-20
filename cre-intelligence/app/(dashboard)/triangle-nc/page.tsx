@@ -111,7 +111,7 @@ export default function TriangleNCPage() {
       </div>
 
       {/* Hero KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -127,7 +127,7 @@ export default function TriangleNCPage() {
       <div className="neon-divider" />
 
       {/* Unemp + Rates charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {loading ? (<><ChartSkeleton /><ChartSkeleton /></>) : (
           <>
             <LineChart
@@ -160,7 +160,7 @@ export default function TriangleNCPage() {
 
       {/* Census charts */}
       {population.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+        <div className="chart-grid">
           <BarChart
             data={[...population].sort((a, b) => a.population - b.population)}
             xKey="population"
@@ -190,7 +190,7 @@ export default function TriangleNCPage() {
             Research Triangle Park — Key Facts
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div className="kpi-grid-3" style={{ marginBottom: 0 }}>
           {RTP_FACTS.map((fact, i) => (
             <motion.div
               key={fact.label}

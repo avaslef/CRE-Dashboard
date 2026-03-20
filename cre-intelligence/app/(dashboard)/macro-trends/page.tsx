@@ -74,7 +74,7 @@ export default function MacroTrendsPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12, marginBottom: 28 }}>
+      <div className="kpi-grid-6">
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -92,7 +92,7 @@ export default function MacroTrendsPage() {
       <div className="neon-divider" />
 
       {/* Charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+      <div className="chart-grid" style={{ marginBottom: 20 }}>
         {loading ? (
           <><ChartSkeleton /><ChartSkeleton /></>
         ) : (
@@ -127,7 +127,7 @@ export default function MacroTrendsPage() {
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {!loading && (
           <>
             <LineChart

@@ -107,8 +107,9 @@ export function Navbar({ onSidebarToggle }: NavbarProps) {
         </div>
       </div>
 
-      {/* Center: live status */}
+      {/* Center: live status — hidden on mobile */}
       <div
+        className="hide-mobile"
         style={{
           position: "absolute",
           left: "50%",
@@ -138,8 +139,9 @@ export function Navbar({ onSidebarToggle }: NavbarProps) {
 
       {/* Right: controls */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {/* Dark/Light toggle */}
+        {/* Dark/Light toggle — hidden on mobile */}
         <motion.button
+          className="hide-mobile"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setDarkMode(!darkMode)}

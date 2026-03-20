@@ -76,7 +76,7 @@ export default function CapitalMarketsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 28 }}>
+      <div className="kpi-grid-5">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -92,7 +92,7 @@ export default function CapitalMarketsPage() {
 
       <div className="neon-divider" />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {loading ? (
           <><ChartSkeleton /><ChartSkeleton /></>
         ) : (
@@ -133,7 +133,7 @@ export default function CapitalMarketsPage() {
         <h3 style={{ fontSize: "0.95rem", fontWeight: 600, fontFamily: "var(--font-heading)", marginBottom: 16, color: "var(--color-text)" }}>
           Indicative Cap Rate Ranges by Property Type (2024)
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
+        <div className="kpi-grid-5" style={{ marginBottom: 0 }}>
           {[
             { type: "Industrial",    range: "4.5–6.0%",   trend: "up",   color: "#00ff9d" },
             { type: "Multifamily",   range: "4.8–6.5%",   trend: "up",   color: "#00f5ff" },

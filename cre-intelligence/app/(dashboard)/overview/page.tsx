@@ -93,7 +93,7 @@ export default function OverviewPage() {
       </div>
 
       {/* KPI Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-5">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -150,7 +150,7 @@ export default function OverviewPage() {
       <div className="neon-divider" />
 
       {/* Chart row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {loading ? (
           <>
             <ChartSkeleton />

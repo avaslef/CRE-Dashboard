@@ -62,7 +62,7 @@ export default function ResearchPage() {
       </div>
 
       {/* Brokerage resource cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-3">
         {BROKERAGE_LINKS.map((b, i) => (
           <motion.a
             key={b.name}

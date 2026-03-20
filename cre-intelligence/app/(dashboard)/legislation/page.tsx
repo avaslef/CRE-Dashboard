@@ -63,7 +63,7 @@ export default function LegislationPage() {
       </div>
 
       {/* NC Highlight cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-4">
         {NC_HIGHLIGHTS.map((h, i) => (
           <motion.div
             key={h.title}

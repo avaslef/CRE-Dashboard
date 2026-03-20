@@ -48,9 +48,10 @@ const NAV_GROUPS = [
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  onNavClick?: () => void;
 }
 
-export function Sidebar({ isOpen, onToggle }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, onNavClick }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -176,6 +177,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     className={`sidebar-item ${active ? "active" : ""}`}
                     title={!isOpen ? item.label : undefined}
                     style={{ justifyContent: isOpen ? "flex-start" : "center" }}
+                    onClick={onNavClick}
                   >
                     <Icon
                       size={18}

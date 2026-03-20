@@ -69,7 +69,7 @@ export default function DemandSignalsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -84,7 +84,7 @@ export default function DemandSignalsPage() {
       <div className="neon-divider" />
 
       {/* Charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {loading ? (
           <><ChartSkeleton /><ChartSkeleton /></>
         ) : (
@@ -140,23 +140,29 @@ export default function DemandSignalsPage() {
           ))}
         </div>
 
-        {/* Embedded Google Trends iframes — one per keyword for better readability */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Embedded Google Trends iframes */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {[
-            { kw: "commercial+real+estate", label: "commercial real estate" },
-            { kw: "industrial+warehouse", label: "industrial warehouse" },
-            { kw: "office+for+lease", label: "office for lease" },
-            { kw: "Raleigh+real+estate", label: "Raleigh real estate" },
-          ].map(({ kw, label }) => (
-            <div key={kw} style={{ borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <p style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", padding: "6px 12px", background: "rgba(255,255,255,0.02)" }}>
-                {label}
-              </p>
+            { kw: "commercial+real+estate", label: "commercial real estate", desc: "Broad CRE market sentiment" },
+            { kw: "industrial+warehouse", label: "industrial warehouse", desc: "Industrial & logistics demand signal" },
+            { kw: "office+for+lease", label: "office for lease", desc: "Office leasing demand trend" },
+            { kw: "Raleigh+real+estate", label: "Raleigh real estate", desc: "Triangle NC market interest" },
+          ].map(({ kw, label, desc }) => (
+            <div key={kw} className="glass" style={{ overflow: "hidden", padding: 0 }}>
+              <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text)" }}>{label}</p>
+                  <p style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", marginTop: 2 }}>{desc}</p>
+                </div>
+                <a href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(label.replace(/\+/g, " "))}&geo=US`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", textDecoration: "none" }}>
+                  Open in Trends ↗
+                </a>
+              </div>
               <iframe
                 title={`Google Trends — ${label}`}
                 src={`https://trends.google.com/trends/embed/explore/TIMESERIES?req=%7B%22comparisonItem%22%3A%5B%7B%22keyword%22%3A%22${kw}%22%2C%22geo%22%3A%22US%22%2C%22time%22%3A%22today%205-y%22%7D%5D%2C%22category%22%3A0%2C%22property%22%3A%22%22%7D&tz=-300&lang=en`}
                 width="100%"
-                height="300"
+                height="400"
                 sandbox="allow-scripts allow-same-origin"
                 referrerPolicy="no-referrer"
                 style={{ border: "none", display: "block" }}

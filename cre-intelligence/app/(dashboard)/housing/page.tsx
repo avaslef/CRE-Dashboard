@@ -12,7 +12,6 @@ import { NATIONAL_SERIES } from "@/lib/constants";
 import { fetchFredLatest, fetchFredMulti } from "@/lib/api";
 import type { FredObservation } from "@/types";
 
-const ZILLOW_METROS = ["Raleigh", "Charlotte", "Nashville", "Austin", "Atlanta", "New York", "Los Angeles"];
 
 export default function HousingPage() {
   const [kpis, setKpis] = useState({ mortgage: null as number | null, housingStarts: null as number | null, permits: null as number | null });
@@ -61,7 +60,7 @@ export default function HousingPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="kpi-grid-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
@@ -76,7 +75,7 @@ export default function HousingPage() {
       <div className="neon-divider" />
 
       {/* Charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+      <div className="chart-grid">
         {loading ? (
           <><ChartSkeleton /><ChartSkeleton /></>
         ) : (
@@ -107,58 +106,70 @@ export default function HousingPage() {
       <div className="neon-divider" />
 
       {/* CSHI — Can't Sell House Index */}
-      <div className="glass" style={{ padding: 24, marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
-          <TrendingDown size={18} color="#ef4444" />
-          <h3 style={{ fontSize: "1rem", fontWeight: 600, fontFamily: "var(--font-heading)" }}>
-            The "Can't Sell House" Index (CSHI)
-          </h3>
-          <GlowBadge label="Google Trends" variant="triangle" />
-        </div>
-        <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginBottom: 4, lineHeight: 1.6 }}>
-          A tongue-in-cheek — but surprisingly useful — leading indicator of housing market stress. Aggregates
-          Google Trends search interest for four distress signals: <em>"can't sell house"</em>, <em>"house won't sell"</em>,{" "}
-          <em>"price reduction home"</em>, and <em>"how long to sell house"</em>.
-        </p>
-        <p style={{ fontSize: "0.77rem", color: "var(--color-text-dim)", marginBottom: 16, lineHeight: 1.6 }}>
-          <strong style={{ color: "var(--color-text-muted)" }}>Formula:</strong>{" "}
-          CSHI(t) = (raw_avg(t) / period_mean) × 50 — centered at 50. Readings above 65 signal elevated seller stress;
-          below 35 indicates a strong seller's market.
-        </p>
+      <div style={{ marginBottom: 28 }}>
+        {/* Header card */}
+        <div className="glass" style={{ padding: 24, marginBottom: 16, borderColor: "rgba(239,68,68,0.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+            <TrendingDown size={20} color="#ef4444" />
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, fontFamily: "var(--font-heading)" }}>
+              The "Can't Sell House" Index (CSHI)
+            </h3>
+            <GlowBadge label="Google Trends" variant="triangle" />
+          </div>
+          <p style={{ fontSize: "0.82rem", color: "var(--color-text-muted)", lineHeight: 1.7, marginBottom: 16 }}>
+            A leading indicator of housing market stress — aggregates Google Trends search interest for four seller-distress signals.
+            Search behavior typically <strong style={{ color: "var(--color-text)" }}>leads formal housing data by 4–8 weeks</strong>.
+          </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {/* Legend row */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {[
+              { label: "CSHI < 35", desc: "Strong seller's market", color: "#00ff9d" },
+              { label: "35 – 50",   desc: "Healthy / mild seller confidence", color: "#00ff9d" },
+              { label: "50 – 65",   desc: "Softening demand, some stress", color: "#fcd34d" },
+              { label: "> 65",      desc: "Elevated distress, buyer's market", color: "#ef4444" },
+            ].map(({ label, desc, color }) => (
+              <div key={label} style={{ padding: "8px 14px", background: "rgba(255,255,255,0.03)", border: `1px solid ${color}30`, borderRadius: 8, flex: "1 1 160px" }}>
+                <p style={{ fontSize: "0.82rem", fontWeight: 700, color, fontFamily: "var(--font-display)" }}>{label}</p>
+                <p style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", marginTop: 2 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* One card per search signal */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[
-            { kw: "can%27t+sell+house",       label: `"can't sell house"` },
-            { kw: "house+won%27t+sell",        label: `"house won't sell"` },
-            { kw: "price+reduction+home",      label: `"price reduction home"` },
-            { kw: "how+long+to+sell+house",    label: `"how long to sell house"` },
-          ].map(({ kw, label }) => (
-            <div key={kw} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid rgba(239,68,68,0.15)" }}>
-              <p style={{ fontSize: "0.68rem", color: "var(--color-text-dim)", padding: "5px 10px", background: "rgba(239,68,68,0.04)" }}>
-                {label}
-              </p>
+            { kw: "can%27t+sell+house",    label: "\"Can't Sell House\"",       desc: "Homeowners stuck with unsold inventory — a direct proxy for illiquid seller conditions." },
+            { kw: "house+won%27t+sell",    label: "\"House Won't Sell\"",        desc: "Signals failed listing attempts and buyer hesitation in the market." },
+            { kw: "price+reduction+home",  label: "\"Price Reduction Home\"",    desc: "Searches spike when sellers are forced to cut asking prices — confirms softening demand." },
+            { kw: "how+long+to+sell+house",label: "\"How Long to Sell House\"",  desc: "Rising interest signals lengthening days-on-market and reduced transaction velocity." },
+          ].map(({ kw, label, desc }) => (
+            <div key={kw} className="glass" style={{ overflow: "hidden", padding: 0, borderColor: "rgba(239,68,68,0.15)" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+                <div>
+                  <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--color-text)", fontFamily: "var(--font-heading)" }}>{label}</p>
+                  <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: 4, lineHeight: 1.5, maxWidth: 560 }}>{desc}</p>
+                </div>
+                <a
+                  href={`https://trends.google.com/trends/explore?q=${kw.replace(/%27/g, "'").replace(/\+/g, " ")}&geo=US`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", textDecoration: "none", whiteSpace: "nowrap", alignSelf: "center" }}
+                >
+                  Open in Trends ↗
+                </a>
+              </div>
               <iframe
                 title={`CSHI — ${label}`}
                 src={`https://trends.google.com/trends/embed/explore/TIMESERIES?req=%7B%22comparisonItem%22%3A%5B%7B%22keyword%22%3A%22${kw}%22%2C%22geo%22%3A%22US%22%2C%22time%22%3A%22today%205-y%22%7D%5D%2C%22category%22%3A0%2C%22property%22%3A%22%22%7D&tz=-300&lang=en`}
                 width="100%"
-                height="280"
+                height="380"
                 sandbox="allow-scripts allow-same-origin"
                 referrerPolicy="no-referrer"
                 style={{ border: "none", display: "block" }}
               />
             </div>
           ))}
-        </div>
-
-        <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(239,68,68,0.05)", borderRadius: 8, border: "1px solid rgba(239,68,68,0.1)" }}>
-          <p style={{ fontSize: "0.73rem", color: "var(--color-text-muted)", lineHeight: 1.7 }}>
-            <strong>Reading the index:</strong>{" "}
-            <span style={{ color: "#00ff9d" }}>CSHI &lt; 35</span> — Strong seller's market.{" "}
-            <span style={{ color: "#00ff9d" }}>35–50</span> — Healthy, mild seller confidence.{" "}
-            <span style={{ color: "#fcd34d" }}>50–65</span> — Some seller stress, softening demand.{" "}
-            <span style={{ color: "#ef4444" }}>&gt; 65</span> — Elevated distress, buyer's market, price cuts likely.
-            Search behavior typically leads formal housing data by 4–8 weeks.
-          </p>
         </div>
       </div>
 

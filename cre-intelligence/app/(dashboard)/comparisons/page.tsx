@@ -7,8 +7,8 @@ import { GlowBadge } from "@/components/ui/GlowBadge";
 import { KPICardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { BarChart } from "@/components/charts/BarChart";
 import { InsightCard } from "@/components/ui/InsightCard";
-import { MARKET_TIERS } from "@/lib/constants";
-import { fetchFredLatest } from "@/lib/api";
+import { MARKET_TIERS, TIER_COLOR_MAP } from "@/lib/constants";
+import { fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
 import { exportCsv } from "@/lib/utils";
 import { Download } from "lucide-react";
 
@@ -31,28 +31,23 @@ export default function ComparisonsPage() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const allMarkets = Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
-        data.markets.map((m: (typeof data.markets)[number]) => ({ ...m, tier, color: data.color }))
+      const allMarkets = getAllMarkets(MARKET_TIERS as any);
+      const unempMap = await fetchFredLatestBatched(
+        allMarkets.map((m) => ({ key: m.name, seriesId: m.fredUnemp }))
       );
-      const withUnemp = await Promise.all(
-        allMarkets.map(async (m) => ({
-          market: m.name,
-          tier: m.tier,
-          color: m.color,
-          unemp: await fetchFredLatest(m.fredUnemp),
-        }))
-      );
+      const withUnemp: MarketRow[] = allMarkets.map((m) => ({
+        market: m.name,
+        tier: m.tier,
+        color: m.color,
+        unemp: unempMap[m.name] ?? null,
+      }));
       setRows(withUnemp);
       setLoading(false);
     }
     load();
   }, []);
 
-  const tierColorMap: Record<string, string> = {
-    "Gateway": "#ef4444",
-    "Tier 1": "#f59e0b",
-    "Tier 2 / Emerging": "#00ff9d",
-  };
+  const tierColorMap = TIER_COLOR_MAP;
 
   const filtered = tierFilter ? rows.filter((r) => r.tier === tierFilter) : rows;
   const sorted = [...filtered].sort((a, b) => {

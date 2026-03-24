@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, RefreshCw, Sun, Moon, ExternalLink } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -10,6 +11,7 @@ interface NavbarProps {
 }
 
 function useLastUpdated() {
+  const router = useRouter();
   const [lastUpdated, setLastUpdated] = useState<string>(() =>
     new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
   );
@@ -17,8 +19,10 @@ function useLastUpdated() {
 
   const refresh = useCallback(async () => {
     setIsRefreshing(true);
-    // Invalidate by reloading the page data (router.refresh in real app)
-    await new Promise((r) => setTimeout(r, 1200));
+    // Actually refresh the page data via Next.js router
+    router.refresh();
+    // Small delay for visual feedback
+    await new Promise((r) => setTimeout(r, 800));
     setLastUpdated(
       new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     );
@@ -33,7 +37,7 @@ function useLastUpdated() {
       ticks: 80,
       gravity: 1.2,
     });
-  }, []);
+  }, [router]);
 
   return { lastUpdated, isRefreshing, refresh };
 }
@@ -41,6 +45,11 @@ function useLastUpdated() {
 export function Navbar({ onSidebarToggle }: NavbarProps) {
   const { lastUpdated, isRefreshing, refresh } = useLastUpdated();
   const [darkMode, setDarkMode] = useState(true);
+
+  // Apply dark/light theme class to <html>
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   return (
     <header
@@ -174,7 +183,7 @@ export function Navbar({ onSidebarToggle }: NavbarProps) {
         {/* GitHub link */}
         <motion.a
           whileHover={{ scale: 1.05 }}
-          href="https://github.com"
+          href="https://github.com/alexvaslef/cre-dashboard"
           target="_blank"
           rel="noopener noreferrer"
           style={{

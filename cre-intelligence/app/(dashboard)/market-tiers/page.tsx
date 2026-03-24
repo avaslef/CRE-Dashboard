@@ -7,8 +7,8 @@ import { GlowBadge } from "@/components/ui/GlowBadge";
 import { KPICardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { InsightCard } from "@/components/ui/InsightCard";
 import { BarChart } from "@/components/charts/BarChart";
-import { MARKET_TIERS } from "@/lib/constants";
-import { fetchFredLatest } from "@/lib/api";
+import { MARKET_TIERS, TIER_COLOR_MAP } from "@/lib/constants";
+import { fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
 
 interface MarketData {
   name: string;
@@ -26,28 +26,17 @@ export default function MarketTiersPage() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const allMarkets = Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
-        data.markets.map((m: (typeof data.markets)[number]) => ({ ...m, tier, color: data.color, highlight: !!m.highlight }))
+      const allMarkets = getAllMarkets(MARKET_TIERS as any);
+      const unempMap = await fetchFredLatestBatched(
+        allMarkets.map((m) => ({ key: m.name, seriesId: m.fredUnemp }))
       );
-
-      // Batch in groups of 6 to avoid FRED rate limiting
-      const BATCH = 6;
-      const withUnemp: MarketData[] = [];
-      for (let i = 0; i < allMarkets.length; i += BATCH) {
-        const batch = await Promise.all(
-          allMarkets.slice(i, i + BATCH).map(async (m) => ({
-            name: m.name,
-            unemp: await fetchFredLatest(m.fredUnemp),
-            tier: m.tier,
-            color: m.color,
-            highlight: m.highlight,
-          }))
-        );
-        withUnemp.push(...batch);
-        if (i + BATCH < allMarkets.length) {
-          await new Promise((r) => setTimeout(r, 250));
-        }
-      }
+      const withUnemp: MarketData[] = allMarkets.map((m) => ({
+        name: m.name,
+        unemp: unempMap[m.name] ?? null,
+        tier: m.tier,
+        color: m.color,
+        highlight: !!m.highlight,
+      }));
       setMarkets(withUnemp);
       setLoading(false);
     }
@@ -69,11 +58,7 @@ export default function MarketTiersPage() {
     })
     .map((m) => ({ Market: m.name, Unemployment: m.unemp ?? 0, Tier: m.tier }));
 
-  const tierColorMap: Record<string, string> = {
-    "Gateway":           "#ef4444",
-    "Tier 1":            "#f59e0b",
-    "Tier 2 / Emerging": "#00ff9d",
-  };
+  const tierColorMap = TIER_COLOR_MAP;
 
   const insights = [
     "Gateway markets carry the lowest unemployment but face deeper structural headwinds in office demand.",

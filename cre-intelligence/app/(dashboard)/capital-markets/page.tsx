@@ -131,7 +131,7 @@ export default function CapitalMarketsPage() {
       {/* Conceptual cap rate table */}
       <div className="glass" style={{ padding: "20px", marginBottom: 28 }}>
         <h3 style={{ fontSize: "0.95rem", fontWeight: 600, fontFamily: "var(--font-heading)", marginBottom: 16, color: "var(--color-text)" }}>
-          Indicative Cap Rate Ranges by Property Type (2024)
+          Reference Cap Rate Ranges by Property Type
         </h3>
         <div className="kpi-grid-5" style={{ marginBottom: 0 }}>
           {[

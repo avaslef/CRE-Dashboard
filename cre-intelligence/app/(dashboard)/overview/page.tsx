@@ -13,7 +13,7 @@ import { InsightCard } from "@/components/ui/InsightCard";
 import { GlowBadge } from "@/components/ui/GlowBadge";
 import { LineChart, fredToChartData } from "@/components/charts/LineChart";
 import { MARKET_TIERS, NATIONAL_SERIES, OVERVIEW_INSIGHTS } from "@/lib/constants";
-import { fetchFredLatest, fetchFredMulti, fetchFredSeries } from "@/lib/api";
+import { fetchFredLatest, fetchFredMulti, fetchFredSeries, fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
 import type { FredObservation } from "@/types";
 
 interface OverviewKPIs {
@@ -58,21 +58,11 @@ export default function OverviewPage() {
       setRatesHistory(rates);
 
       // Fetch unemployment for all markets — batched to avoid FRED rate limiting
-      const allMarkets = Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
-        data.markets.map((m: (typeof data.markets)[number]) => ({ ...m, tier }))
+      const allMarkets = getAllMarkets(MARKET_TIERS as any);
+      const unempMap = await fetchFredLatestBatched(
+        allMarkets.map((m) => ({ key: m.name, seriesId: m.fredUnemp }))
       );
-      const BATCH = 6;
-      const unempEntries: [string, number | null][] = [];
-      for (let i = 0; i < allMarkets.length; i += BATCH) {
-        const batch = await Promise.all(
-          allMarkets.slice(i, i + BATCH).map((m) =>
-            fetchFredLatest(m.fredUnemp).then((v) => [m.name, v] as [string, number | null])
-          )
-        );
-        unempEntries.push(...batch);
-        if (i + BATCH < allMarkets.length) await new Promise((r) => setTimeout(r, 250));
-      }
-      setTierUnemp(Object.fromEntries(unempEntries));
+      setTierUnemp(unempMap);
       setLoading(false);
     }
     load();

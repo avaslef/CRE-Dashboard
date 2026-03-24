@@ -54,7 +54,11 @@ export function exportChartPng(containerId: string, _filename: string) {
   if (!el) return;
   const w = window.open("", "_blank");
   if (!w) return;
-  w.document.write(`<html><body style="margin:0;background:#050505">${el.innerHTML}</body></html>`);
+  // Use cloneNode instead of innerHTML to prevent XSS
+  const clone = el.cloneNode(true) as HTMLElement;
+  w.document.body.style.margin = "0";
+  w.document.body.style.background = "#050505";
+  w.document.body.appendChild(clone);
   w.document.close();
   w.focus();
   w.print();

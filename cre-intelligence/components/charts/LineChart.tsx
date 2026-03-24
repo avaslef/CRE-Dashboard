@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import type { FredObservation } from "@/types";
 import { exportCsv } from "@/lib/utils";
 import { Download } from "lucide-react";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 interface LineChartSeries {
   key: string;
@@ -28,7 +29,7 @@ interface LineChartProps {
   title?: string;
   yAxisLabel?: string;
   height?: number;
-  referenceLines?: { x: string; label: string; color: string }[];
+  referenceLines?: { x?: string; y?: number; label: string; color: string }[];
   showExport?: boolean;
   exportFilename?: string;
 }
@@ -74,7 +75,15 @@ const CustomTooltip = ({
   );
 };
 
-export function LineChart({
+export function LineChart(props: LineChartProps) {
+  return (
+    <ErrorBoundary fallbackTitle="Chart failed to render">
+      <LineChartInner {...props} />
+    </ErrorBoundary>
+  );
+}
+
+function LineChartInner({
   data,
   series,
   title,
@@ -165,14 +174,15 @@ export function LineChart({
           )}
 
           {/* Reference lines for events */}
-          {referenceLines?.map((rl) => (
+          {referenceLines?.map((rl, idx) => (
             <ReferenceLine
-              key={rl.x}
-              x={rl.x}
+              key={rl.x ?? `y-${rl.y}-${idx}`}
+              {...(rl.x != null ? { x: rl.x } : {})}
+              {...(rl.y != null ? { y: rl.y } : {})}
               stroke={rl.color}
               strokeDasharray="4 4"
               strokeWidth={1}
-              label={{ value: rl.label, fill: rl.color, fontSize: 9, position: "top" }}
+              label={{ value: rl.label, fill: rl.color, fontSize: 9, position: rl.y != null ? "right" : "top" }}
             />
           ))}
 
@@ -202,20 +212,26 @@ export function LineChart({
 export function fredToChartData(
   seriesMap: Record<string, FredObservation[]>
 ): Record<string, string | number>[] {
-  // Build union of all dates
+  // Build date-indexed Maps for O(1) lookup instead of O(n) find()
   const dateSet = new Set<string>();
-  Object.values(seriesMap).forEach((obs) =>
-    obs.forEach((o) => dateSet.add(o.date))
-  );
+  const dateMaps: Record<string, Map<string, number>> = {};
+  for (const [key, obs] of Object.entries(seriesMap)) {
+    const map = new Map<string, number>();
+    for (const o of obs) {
+      dateSet.add(o.date);
+      map.set(o.date, o.value);
+    }
+    dateMaps[key] = map;
+  }
 
   return Array.from(dateSet)
     .sort()
     .map((date) => {
       const row: Record<string, string | number> = { date };
-      Object.entries(seriesMap).forEach(([key, obs]) => {
-        const match = obs.find((o) => o.date === date);
-        if (match) row[key] = match.value;
-      });
+      for (const [key, map] of Object.entries(dateMaps)) {
+        const val = map.get(date);
+        if (val !== undefined) row[key] = val;
+      }
       return row;
     });
 }

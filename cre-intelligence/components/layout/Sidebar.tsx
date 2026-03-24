@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Layers, TrendingUp, MapPin,
   Building2, Home, Newspaper, Briefcase, Gavel,
   Search, Map, BarChart2, ChevronLeft, ChevronRight,
-  Zap,
+  Zap, LineChart as LineChartIcon,
 } from "lucide-react";
 
 const NAV_GROUPS = [
@@ -41,6 +41,7 @@ const NAV_GROUPS = [
       { label: "Demand Signals",    href: "/demand-signals", icon: Search },
       { label: "Interactive Map",   href: "/map",             icon: Map },
       { label: "Market Comparisons",href: "/comparisons",    icon: BarChart2 },
+      { label: "Forecasting",      href: "/forecasting",    icon: LineChartIcon },
     ],
   },
 ];

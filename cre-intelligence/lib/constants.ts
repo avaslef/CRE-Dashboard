@@ -135,6 +135,13 @@ export const TIER_COLORS = {
   National:          { stroke: "#a855f7", fill: "rgba(168,85,247,0.15)" },
 } as const;
 
+/** Simple tier → hex color map for chart colorKey props */
+export const TIER_COLOR_MAP: Record<string, string> = {
+  "Gateway": "#ef4444",
+  "Tier 1": "#f59e0b",
+  "Tier 2 / Emerging": "#00ff9d",
+} as const;
+
 // ─── KEY INSIGHT BULLETS (per page) ──────────────────────────────────────────
 export const OVERVIEW_INSIGHTS = [
   "Rising interest rates since 2022 have compressed CRE valuations across all property types.",

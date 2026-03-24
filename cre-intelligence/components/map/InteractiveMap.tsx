@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import { motion } from "framer-motion";
 import { GlowBadge } from "@/components/ui/GlowBadge";
@@ -35,14 +35,15 @@ export default function InteractiveMap({ focusTriangle = false, height = 520 }: 
   const center: [number, number] = focusTriangle ? [35.85, -78.9] : [39, -96];
   const zoom = focusTriangle ? 8 : 4;
 
-  const allMarkets: MarketWithTier[] = Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
-    data.markets.map((m: (typeof data.markets)[number]) => ({
-      ...m,
-      tier,
-      tierColor: TIER_COLORS[tier as keyof typeof TIER_COLORS].stroke,
-      neonColor: TIER_COLORS[tier as keyof typeof TIER_COLORS].neon,
-    }))
-  );
+  const allMarkets: MarketWithTier[] = useMemo(() =>
+    Object.entries(MARKET_TIERS).flatMap(([tier, data]) =>
+      data.markets.map((m: (typeof data.markets)[number]) => ({
+        ...m,
+        tier,
+        tierColor: TIER_COLORS[tier as keyof typeof TIER_COLORS].stroke,
+        neonColor: TIER_COLORS[tier as keyof typeof TIER_COLORS].neon,
+      }))
+    ), []);
 
   if (!isMounted) {
     return (

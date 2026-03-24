@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Search, TrendingUp, Activity } from "lucide-react";
 import { NumericKPICard } from "@/components/ui/KPICard";
@@ -11,6 +11,51 @@ import { GlowBadge } from "@/components/ui/GlowBadge";
 import { NATIONAL_SERIES } from "@/lib/constants";
 import { fetchFredLatest, fetchFredMulti } from "@/lib/api";
 import type { FredObservation } from "@/types";
+
+function LazyTrendsIframe({ kw, label, desc }: { kw: string; label: string; desc: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="glass" style={{ overflow: "hidden", padding: 0 }}>
+      <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text)" }}>{label}</p>
+          <p style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", marginTop: 2 }}>{desc}</p>
+        </div>
+        <a href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(label.replace(/\+/g, " "))}&geo=US`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", textDecoration: "none" }}>
+          Open in Trends ↗
+        </a>
+      </div>
+      {visible ? (
+        <iframe
+          title={`Google Trends — ${label}`}
+          src={`https://trends.google.com/trends/embed/explore/TIMESERIES?req=%7B%22comparisonItem%22%3A%5B%7B%22keyword%22%3A%22${kw}%22%2C%22geo%22%3A%22US%22%2C%22time%22%3A%22today%205-y%22%7D%5D%2C%22category%22%3A0%2C%22property%22%3A%22%22%7D&tz=-300&lang=en`}
+          width="100%"
+          height="400"
+          sandbox="allow-scripts allow-same-origin"
+          referrerPolicy="no-referrer"
+          style={{ border: "none", display: "block" }}
+        />
+      ) : (
+        <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-dim)", fontSize: "0.8rem" }}>
+          Loading trends data...
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function DemandSignalsPage() {
   const [kpis, setKpis] = useState({ retailSales: null as number | null, natUnemp: null as number | null, gdpGrowth: null as number | null });
@@ -140,7 +185,7 @@ export default function DemandSignalsPage() {
           ))}
         </div>
 
-        {/* Embedded Google Trends iframes */}
+        {/* Embedded Google Trends iframes — lazy-loaded via IntersectionObserver */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {[
             { kw: "commercial+real+estate", label: "commercial real estate", desc: "Broad CRE market sentiment" },
@@ -148,26 +193,7 @@ export default function DemandSignalsPage() {
             { kw: "office+for+lease", label: "office for lease", desc: "Office leasing demand trend" },
             { kw: "Raleigh+real+estate", label: "Raleigh real estate", desc: "Triangle NC market interest" },
           ].map(({ kw, label, desc }) => (
-            <div key={kw} className="glass" style={{ overflow: "hidden", padding: 0 }}>
-              <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text)" }}>{label}</p>
-                  <p style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", marginTop: 2 }}>{desc}</p>
-                </div>
-                <a href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(label.replace(/\+/g, " "))}&geo=US`} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", textDecoration: "none" }}>
-                  Open in Trends ↗
-                </a>
-              </div>
-              <iframe
-                title={`Google Trends — ${label}`}
-                src={`https://trends.google.com/trends/embed/explore/TIMESERIES?req=%7B%22comparisonItem%22%3A%5B%7B%22keyword%22%3A%22${kw}%22%2C%22geo%22%3A%22US%22%2C%22time%22%3A%22today%205-y%22%7D%5D%2C%22category%22%3A0%2C%22property%22%3A%22%22%7D&tz=-300&lang=en`}
-                width="100%"
-                height="400"
-                sandbox="allow-scripts allow-same-origin"
-                referrerPolicy="no-referrer"
-                style={{ border: "none", display: "block" }}
-              />
-            </div>
+            <LazyTrendsIframe key={kw} kw={kw} label={label} desc={desc} />
           ))}
         </div>
       </div>

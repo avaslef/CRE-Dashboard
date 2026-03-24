@@ -1,115 +1,116 @@
 # CRE Intelligence Dashboard
 
-A fully interactive Commercial Real Estate (CRE) web dashboard built with **100% free APIs** and open-source libraries. Designed for market analysis with a focus on the Triangle region of NC (Raleigh-Durham-Chapel Hill).
+A fully interactive Commercial Real Estate (CRE) web dashboard built with **Next.js 15, React 19, and TypeScript** using **100% free APIs**. Designed for market analysis with a focus on the Triangle region of NC (Raleigh-Durham-Chapel Hill) — developed for UNC Chapel Hill's Kenan-Flagler Business School MBA program.
 
 ---
 
-## Screenshots
+## Pages
 
-The dashboard includes 8 navigation pages:
-- **Overview** — National macro KPIs and tier summary cards
-- **Market Tiers** — All 30+ MSAs with unemployment comparisons
-- **Macro Trends** — CRE price index, rates, GDP, construction spending
-- **Triangle NC Deep Dive** — The star section: local macros, RTP facts, Census data, live news
-- **Deal Flow & News** — Live news feed (NewsAPI), filterable by query
-- **Business & Legislation** — NC tax environment, policy news, incentives
-- **Interactive Map** — Folium choropleth/marker map by tier (or Plotly fallback)
-- **Market Comparisons** — Multi-select side-by-side analysis
+| Page | Description |
+|------|-------------|
+| **Overview** | National macro KPIs, market tier summary cards, live FRED data |
+| **Market Tiers** | All 30+ MSAs with unemployment comparisons and tier classification |
+| **Macro Trends** | CRE price index, rates, GDP, construction spending (FRED) |
+| **Triangle NC Deep Dive** | Local macros, RTP facts, Census population & income data, live news |
+| **Demand Signals** | Retail sales, unemployment, GDP, Google Trends CRE search interest |
+| **Capital Markets** | Treasury yields, cap rate model, CSHI index, Fed Funds |
+| **Market Comparisons** | Multi-market side-by-side unemployment comparison |
+| **Interactive Map** | Leaflet map of all tracked MSAs with tier color-coding |
+| **Deal Flow & News** | Live news feed via NewsAPI, filterable by query |
+| **Business & Legislation** | NC tax environment, policy news, business incentives |
+| **Forecasting** | Yield curve monitor, cap rate model (Gordon Growth), DSCR stress test, financial conditions heatmap |
 
 ---
 
 ## Quickstart
 
-### 1. Clone / download
+### 1. Clone the repo
 
 ```bash
-cd "CRE Dashboard"
+git clone https://github.com/alexvaslef/cre-dashboard.git
+cd "cre-dashboard/cre-intelligence"
 ```
 
 ### 2. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+npm install
 ```
-
-> **Optional:** For PNG export from charts, also install `kaleido`:
-> ```bash
-> pip install kaleido
-> ```
 
 ### 3. Get your free API keys
 
 #### FRED API (Federal Reserve Economic Data)
-- URL: https://fred.stlouisfed.org/docs/api/api_key.html
-- Sign up for a free account at stlouisfed.org
+- Sign up at https://fred.stlouisfed.org/docs/api/api_key.html
 - Go to **My Account → API Keys** and generate a key
-- Takes ~1 minute; key is active immediately
 
 #### U.S. Census Bureau API
-- URL: https://api.census.gov/data/key_signup.html
-- Fill in name and email — key is emailed instantly
-- Free, no rate limit for personal/research use
+- Register at https://api.census.gov/data/key_signup.html
+- Key is emailed instantly; free with no rate limit for personal/research use
 
 #### NewsAPI.org
-- URL: https://newsapi.org/register
-- Free developer plan: **100 requests/day**, articles from past 30 days
-- Sign up and copy your API key from the dashboard
+- Register at https://newsapi.org/register
+- Free developer plan: 100 requests/day
 
 ### 4. Configure environment
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Open `.env` and replace the placeholder values:
+Open `.env.local` and fill in your keys:
+
 ```
-FRED_API_KEY=your_actual_fred_key
-CENSUS_API_KEY=your_actual_census_key
-NEWS_API_KEY=your_actual_newsapi_key
+FRED_API_KEY=your_fred_key
+CENSUS_API_KEY=your_census_key
+NEWS_API_KEY=your_newsapi_key
 ```
 
-### 5. Run the dashboard
+### 5. Run the dev server
 
 ```bash
-streamlit run app.py
+npm run dev
 ```
 
-The app opens at **http://localhost:8501**
+Open **http://localhost:3000**
 
 ---
 
-## Free Deployment
+## Deployment (Vercel — free)
 
-### Streamlit Community Cloud (100% free)
+1. Push repo to GitHub
+2. Import at https://vercel.com/new
+3. Set **Root Directory** to `cre-intelligence`
+4. Add environment variables (`FRED_API_KEY`, `CENSUS_API_KEY`, `NEWS_API_KEY`) under **Settings → Environment Variables**
+5. Deploy — you'll get a public URL automatically
 
-1. Push this repo to GitHub (public or private)
-2. Visit https://share.streamlit.io
-3. Click **New app** → connect your GitHub repo
-4. Set **Main file**: `app.py`
-5. Under **Advanced settings → Secrets**, add your API keys in TOML format:
-   ```toml
-   FRED_API_KEY = "your_key"
-   CENSUS_API_KEY = "your_key"
-   NEWS_API_KEY = "your_key"
-   ```
-6. Deploy — you'll get a public URL like `https://yourname-cre-dashboard.streamlit.app`
+---
 
-> Note: On Streamlit Cloud, use `st.secrets["FRED_API_KEY"]` instead of `.env`. The app is pre-configured to read from environment variables, which Streamlit Cloud populates from secrets automatically.
+## Tech Stack
+
+| Layer | Library |
+|-------|---------|
+| Framework | Next.js 15 (App Router) |
+| UI | React 19, TypeScript |
+| Charts | Recharts |
+| Map | Leaflet / react-leaflet |
+| Animations | Framer Motion |
+| Icons | Lucide React |
+| Styling | CSS custom properties (dark neon theme) |
 
 ---
 
 ## Data Sources
 
-| Source | Data | API | Free Tier |
-|--------|------|-----|-----------|
-| [FRED (St. Louis Fed)](https://fred.stlouisfed.org) | CRE price index, unemployment, rates, GDP | `fredapi` + REST | ✅ Unlimited |
-| [U.S. Census Bureau](https://api.census.gov) | Population, income, business patterns | REST | ✅ Unlimited |
-| [NewsAPI.org](https://newsapi.org) | CRE news, deals, legislation | REST | ✅ 100 req/day |
-| [yfinance](https://pypi.org/project/yfinance/) | VNQ REIT ETF (sentiment proxy) | Python lib | ✅ Free |
+| Source | Data | Free Tier |
+|--------|------|-----------|
+| [FRED (St. Louis Fed)](https://fred.stlouisfed.org) | CRE price index, unemployment, rates, GDP, yield curve | ✅ Unlimited |
+| [U.S. Census Bureau](https://api.census.gov) | Population, income, business patterns | ✅ Unlimited |
+| [NewsAPI.org](https://newsapi.org) | CRE news, deals, legislation | ✅ 100 req/day |
+| [Google Trends](https://trends.google.com) | CRE search interest (embedded iframes) | ✅ Free |
 
 ---
 
-## Key FRED Series Used
+## Key FRED Series
 
 | Series ID | Description |
 |-----------|-------------|
@@ -117,30 +118,58 @@ The app opens at **http://localhost:8501**
 | `FEDFUNDS` | Federal Funds Rate |
 | `UNRATE` | National Unemployment Rate |
 | `DGS10` | 10-Year Treasury Yield |
-| `CPIAUCSL` | Consumer Price Index |
+| `DGS2` | 2-Year Treasury Yield |
 | `MORTGAGE30US` | 30-Year Mortgage Rate |
+| `BAMLH0A0HYM2` | High Yield OAS Spread |
 | `RALE537URN` | Raleigh-Cary Unemployment |
 | `DURH063URN` | Durham Unemployment |
 | `NCURN` | North Carolina Unemployment |
 | `TLNRESCONS` | Non-Residential Construction Spending |
-
-Full list of metro unemployment series: `{MSA_ID}URN` (e.g., `ATLA013URN` for Atlanta)
 
 ---
 
 ## Project Structure
 
 ```
-CRE Dashboard/
-├── app.py           # Main Streamlit application (all 8 pages)
-├── config.py        # Market tiers, FRED series IDs, colors, glossary
-├── helpers.py       # Data fetching functions (FRED, Census, News, yfinance)
-├── charts.py        # Reusable Plotly chart builders
-├── requirements.txt # Python dependencies
-├── .env.example     # Template for API keys
-├── .env             # Your actual keys (DO NOT commit to git)
-└── README.md        # This file
+cre-intelligence/
+├── app/
+│   ├── (dashboard)/         # All page routes
+│   │   ├── overview/
+│   │   ├── market-tiers/
+│   │   ├── macro-trends/
+│   │   ├── triangle-nc/
+│   │   ├── demand-signals/
+│   │   ├── capital-markets/
+│   │   ├── comparisons/
+│   │   ├── map/
+│   │   ├── deal-flow/
+│   │   ├── housing/
+│   │   ├── legislation/
+│   │   ├── research/
+│   │   └── forecasting/
+│   └── api/                 # Proxied API routes (FRED, Census, News)
+├── components/
+│   ├── charts/              # LineChart, BarChart (Recharts)
+│   ├── layout/              # Sidebar, Navbar, ParticleBackground
+│   ├── map/                 # InteractiveMap (Leaflet)
+│   └── ui/                  # KPICard, LoadingSkeleton, ErrorBoundary, etc.
+├── lib/
+│   ├── api.ts               # Data fetching helpers + client-side cache
+│   ├── constants.ts         # Market tiers, FRED series IDs, color maps
+│   └── utils.ts             # Formatting, CSV export, chart PNG export
+└── types/                   # Shared TypeScript interfaces
 ```
+
+---
+
+## Academic Models (Forecasting Tab)
+
+The Forecasting page implements academically published CRE models:
+
+- **Yield Curve Monitor** — Harvey (1988) recession predictor via 10Y-2Y spread
+- **Cap Rate Model** — Gordon Growth variant: `Cap Rate = Risk-Free Rate + Risk Premium − Growth`
+- **DSCR Stress Test** — Debt Service Coverage Ratio with interest rate shock scenarios
+- **Financial Conditions Heatmap** — Multi-indicator CRE stress dashboard
 
 ---
 
@@ -148,25 +177,11 @@ CRE Dashboard/
 
 | Issue | Fix |
 |-------|-----|
-| `ModuleNotFoundError` | Run `pip install -r requirements.txt` |
-| Charts show "Add FRED API key" | Add `FRED_API_KEY` to `.env` |
-| Map doesn't render | Run `pip install folium streamlit-folium` |
-| PNG export fails | Run `pip install kaleido` |
-| NewsAPI returns nothing | Free tier only has past 30 days; key may need reset |
-| FRED series returns empty | Some metro series IDs may vary; check FRED website |
+| Charts show no data | Verify `FRED_API_KEY` is set in `.env.local` |
+| Map doesn't render | SSR conflict — map uses `"use client"` and mounts only after hydration |
+| News feed empty | NewsAPI free tier: 100 req/day limit; key may need reset |
+| Build errors | Run `npm install` then `npm run build` |
 
 ---
 
-## Concepts Covered
-
-Key CRE concepts covered:
-- **Market tiering** — Gateway, Tier 1, Tier 2/Emerging classification
-- **Cap rate dynamics** — relationship to 10-yr Treasury and NOI
-- **Market cycle** — using unemployment and construction spending as cycle indicators
-- **Supply/demand** — building permits vs. absorption
-- **Research Triangle thesis** — why the Triangle is a compelling Tier 2 investment story
-- **Risk factors** — rate sensitivity, office vacancy, supply pipeline
-
----
-
-*Built with Streamlit, Plotly, Folium | Data from FRED, Census, NewsAPI | Free & open source*
+*Built with Next.js 15, React 19, Recharts, Leaflet | Data from FRED, Census, NewsAPI | Free & open source*

@@ -14,6 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { exportCsv } from "@/lib/utils";
 import { Download } from "lucide-react";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 interface BarChartProps {
   data: Record<string, string | number>[];
@@ -35,12 +36,26 @@ const CustomTooltip = ({
   active,
   payload,
   label,
+  xKey,
+  yKey,
+  isHorizontal,
 }: {
   active?: boolean;
   payload?: { name: string; value: number; payload: Record<string, unknown> }[];
   label?: string;
+  xKey?: string;
+  yKey?: string;
+  isHorizontal?: boolean;
 }) => {
   if (!active || !payload?.length) return null;
+
+  // For vertical charts, label = xKey (Market). For horizontal, label = yKey (Market).
+  // Pull the category name from the data row to ensure it always shows.
+  const row = payload[0].payload;
+  const categoryKey = isHorizontal ? yKey : xKey;
+  const valueKey = isHorizontal ? xKey : yKey;
+  const categoryName = categoryKey ? String(row[categoryKey] ?? label) : label;
+  const value = valueKey ? row[valueKey] : payload[0].value;
 
   return (
     <div
@@ -50,19 +65,28 @@ const CustomTooltip = ({
         borderRadius: 10,
         padding: "10px 14px",
         fontFamily: "var(--font-body)",
+        maxWidth: 240,
       }}
     >
       <p style={{ fontSize: "0.78rem", color: "var(--color-text)", fontWeight: 600, marginBottom: 4 }}>
-        {label}
+        {categoryName}
       </p>
       <p style={{ fontSize: "0.82rem", color: "#00f5ff", fontWeight: 700 }}>
-        {typeof payload[0].value === "number" ? payload[0].value.toLocaleString() : payload[0].value}
+        {typeof value === "number" ? `${value.toFixed(1)}%` : String(value ?? "")}
       </p>
     </div>
   );
 };
 
-export function BarChart({
+export function BarChart(props: BarChartProps) {
+  return (
+    <ErrorBoundary fallbackTitle="Chart failed to render">
+      <BarChartInner {...props} />
+    </ErrorBoundary>
+  );
+}
+
+function BarChartInner({
   data,
   xKey,
   yKey,
@@ -160,7 +184,7 @@ export function BarChart({
             </>
           )}
 
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip xKey={xKey} yKey={yKey} isHorizontal={isHorizontal} />} />
 
           <Bar
             dataKey={isHorizontal ? xKey : yKey}

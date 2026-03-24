@@ -18,6 +18,7 @@ interface NumericKPIProps extends Omit<KPICardProps, "value"> {
   prefix?: string;
   suffix?: string;
   decimals?: number;
+  abbrev?: boolean;
 }
 
 /** KPI card with animated count-up for numeric values */
@@ -34,9 +35,10 @@ export function NumericKPICard({
   className,
   prefix = "",
   suffix = "",
-  decimals = 1,
+  decimals = 2,
+  abbrev = false,
 }: NumericKPIProps) {
-  const displayValue = useCountUp(value, { prefix, suffix, decimals });
+  const displayValue = useCountUp(value, { prefix, suffix, decimals, abbrev });
 
   return (
     <KPICard

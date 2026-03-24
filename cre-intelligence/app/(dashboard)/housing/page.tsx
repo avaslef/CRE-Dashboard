@@ -107,69 +107,78 @@ export default function HousingPage() {
 
       {/* CSHI — Can't Sell House Index */}
       <div style={{ marginBottom: 28 }}>
-        {/* Header card */}
-        <div className="glass" style={{ padding: 24, marginBottom: 16, borderColor: "rgba(239,68,68,0.25)" }}>
+        <div className="glass" style={{ padding: 24, borderColor: "rgba(239,68,68,0.25)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
             <TrendingDown size={20} color="#ef4444" />
             <h3 style={{ fontSize: "1.1rem", fontWeight: 700, fontFamily: "var(--font-heading)" }}>
               The "Can't Sell House" Index (CSHI)
             </h3>
-            <GlowBadge label="Google Trends" variant="triangle" />
+            <GlowBadge label="Google Trends Composite" variant="triangle" />
           </div>
-          <p style={{ fontSize: "0.82rem", color: "var(--color-text-muted)", lineHeight: 1.7, marginBottom: 16 }}>
-            A leading indicator of housing market stress — aggregates Google Trends search interest for four seller-distress signals.
-            Search behavior typically <strong style={{ color: "var(--color-text)" }}>leads formal housing data by 4–8 weeks</strong>.
+          <p style={{ fontSize: "0.82rem", color: "var(--color-text-muted)", lineHeight: 1.7, marginBottom: 20 }}>
+            A composite index aggregating Google Trends search interest across 12 seller-distress and housing-stress signals.
+            Higher scores indicate elevated seller anxiety; lower scores reflect healthy transaction velocity.
+            Live CSHI scoring requires direct Trends API access (pytrends) — use the links below to monitor individual signals.
           </p>
 
-          {/* Legend row */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {[
-              { label: "CSHI < 35", desc: "Strong seller's market", color: "#00ff9d" },
-              { label: "35 – 50",   desc: "Healthy / mild seller confidence", color: "#00ff9d" },
-              { label: "50 – 65",   desc: "Softening demand, some stress", color: "#fcd34d" },
-              { label: "> 65",      desc: "Elevated distress, buyer's market", color: "#ef4444" },
-            ].map(({ label, desc, color }) => (
-              <div key={label} style={{ padding: "8px 14px", background: "rgba(255,255,255,0.03)", border: `1px solid ${color}30`, borderRadius: 8, flex: "1 1 160px" }}>
-                <p style={{ fontSize: "0.82rem", fontWeight: 700, color, fontFamily: "var(--font-display)" }}>{label}</p>
-                <p style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", marginTop: 2 }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* One card per search signal */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {[
-            { kw: "can%27t+sell+house",    label: "\"Can't Sell House\"",       desc: "Homeowners stuck with unsold inventory — a direct proxy for illiquid seller conditions." },
-            { kw: "house+won%27t+sell",    label: "\"House Won't Sell\"",        desc: "Signals failed listing attempts and buyer hesitation in the market." },
-            { kw: "price+reduction+home",  label: "\"Price Reduction Home\"",    desc: "Searches spike when sellers are forced to cut asking prices — confirms softening demand." },
-            { kw: "how+long+to+sell+house",label: "\"How Long to Sell House\"",  desc: "Rising interest signals lengthening days-on-market and reduced transaction velocity." },
-          ].map(({ kw, label, desc }) => (
-            <div key={kw} className="glass" style={{ overflow: "hidden", padding: 0, borderColor: "rgba(239,68,68,0.15)" }}>
-              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(239,68,68,0.1)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-                <div>
-                  <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--color-text)", fontFamily: "var(--font-heading)" }}>{label}</p>
-                  <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: 4, lineHeight: 1.5, maxWidth: 560 }}>{desc}</p>
-                </div>
-                <a
-                  href={`https://trends.google.com/trends/explore?q=${kw.replace(/%27/g, "'").replace(/\+/g, " ")}&geo=US`}
-                  target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: "0.7rem", color: "var(--color-text-dim)", textDecoration: "none", whiteSpace: "nowrap", alignSelf: "center" }}
-                >
-                  Open in Trends ↗
-                </a>
-              </div>
-              <iframe
-                title={`CSHI — ${label}`}
-                src={`https://trends.google.com/trends/embed/explore/TIMESERIES?req=%7B%22comparisonItem%22%3A%5B%7B%22keyword%22%3A%22${kw}%22%2C%22geo%22%3A%22US%22%2C%22time%22%3A%22today%205-y%22%7D%5D%2C%22category%22%3A0%2C%22property%22%3A%22%22%7D&tz=-300&lang=en`}
-                width="100%"
-                height="380"
-                sandbox="allow-scripts allow-same-origin"
-                referrerPolicy="no-referrer"
-                style={{ border: "none", display: "block" }}
-              />
+          {/* Score display */}
+          <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 20, flexWrap: "wrap" }}>
+            <div style={{ padding: "14px 24px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, textAlign: "center", minWidth: 120 }}>
+              <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>CSHI Score</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, color: "#fca5a5", lineHeight: 1 }}>N/A</p>
+              <p style={{ fontSize: "0.65rem", color: "var(--color-text-dim)", marginTop: 6 }}>Requires Trends API</p>
             </div>
-          ))}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {[
+                { label: "< 35",   desc: "Strong seller's market",        color: "#00ff9d" },
+                { label: "35–50",  desc: "Healthy / stable",              color: "#00ff9d" },
+                { label: "50–65",  desc: "Softening, some stress",        color: "#fcd34d" },
+                { label: "> 65",   desc: "Elevated distress / buyer's market", color: "#ef4444" },
+              ].map(({ label, desc, color }) => (
+                <div key={label} style={{ padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: `1px solid ${color}25`, borderRadius: 8 }}>
+                  <p style={{ fontSize: "0.78rem", fontWeight: 700, color, fontFamily: "var(--font-display)" }}>{label}</p>
+                  <p style={{ fontSize: "0.67rem", color: "var(--color-text-muted)", marginTop: 2 }}>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 12-term signal table */}
+          <div style={{ borderTop: "1px solid rgba(239,68,68,0.1)", paddingTop: 16 }}>
+            <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-dim)", marginBottom: 12 }}>
+              Aggregated Search Signals (12 terms)
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 8 }}>
+              {[
+                { kw: "can't sell house",       desc: "Unsold inventory — direct seller distress proxy" },
+                { kw: "house won't sell",        desc: "Failed listing attempts, buyer hesitation" },
+                { kw: "price reduction home",    desc: "Forced price cuts, softening demand" },
+                { kw: "how long to sell house",  desc: "Lengthening days-on-market signal" },
+                { kw: "home price drop",         desc: "Buyer expectations shifting lower" },
+                { kw: "housing market crash",    desc: "Macro fear / recession anxiety in housing" },
+                { kw: "mortgage not approved",   desc: "Credit tightening, failed buyer qualification" },
+                { kw: "cancel home purchase",    desc: "Falling through under contract — buyer cold feet" },
+                { kw: "underwater mortgage",     desc: "Negative equity stress signal" },
+                { kw: "seller concession",       desc: "Sellers offering credits — demand weakness" },
+                { kw: "housing bubble",          desc: "Speculative fear index" },
+                { kw: "extend listing days",     desc: "Stale inventory, reduced showing velocity" },
+              ].map(({ kw, desc }) => (
+                <div key={kw} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 8, gap: 8 }}>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--color-text)" }}>"{kw}"</p>
+                    <p style={{ fontSize: "0.67rem", color: "var(--color-text-muted)", marginTop: 2 }}>{desc}</p>
+                  </div>
+                  <a
+                    href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(kw)}&geo=US`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: "0.65rem", color: "var(--color-text-dim)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}
+                  >
+                    Trends ↗
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -84,7 +84,7 @@ export default function MacroTrendsPage() {
             <NumericKPICard title="National Unemp." value={kpis.natUnemp} suffix="%" source="BLS via FRED (UNRATE)" color="cyan" />
             <NumericKPICard title="Fed Funds Rate" value={kpis.fedFunds} suffix="%" source="Federal Reserve via FRED (FEDFUNDS)" color="red" />
             <NumericKPICard title="10-Yr Treasury" value={kpis.t10yr} suffix="%" source="U.S. Treasury via FRED (DGS10)" color="purple" />
-            <NumericKPICard title="Construction Spend" value={kpis.constrSpend} prefix="$" suffix="M" decimals={0} subtitle="Non-residential" source="Census Bureau via FRED (TLNRESCONS)" icon={<Building2 size={15} />} color="cyan" />
+            <NumericKPICard title="Construction Spend" value={kpis.constrSpend != null ? kpis.constrSpend * 1e6 : null} prefix="$" decimals={2} abbrev subtitle="Non-residential (annualized)" source="Census Bureau via FRED (TLNRESCONS)" icon={<Building2 size={15} />} color="cyan" />
           </>
         )}
       </div>

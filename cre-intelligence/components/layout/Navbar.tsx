@@ -59,7 +59,7 @@ export function Navbar({ onSidebarToggle }: NavbarProps) {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 24px",
-        background: "rgba(5,5,10,0.6)",
+        background: "var(--color-nav-bg, rgba(5,5,10,0.6))",
         backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(0,245,255,0.07)",
         position: "relative",
@@ -183,7 +183,7 @@ export function Navbar({ onSidebarToggle }: NavbarProps) {
         {/* GitHub link */}
         <motion.a
           whileHover={{ scale: 1.05 }}
-          href="https://github.com/alexvaslef/cre-dashboard"
+          href="https://github.com/avaslef/CRE-Dashboard"
           target="_blank"
           rel="noopener noreferrer"
           style={{

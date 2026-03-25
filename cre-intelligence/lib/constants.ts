@@ -68,6 +68,7 @@ export const NATIONAL_SERIES = {
   constructionSpend:  "TLNRESCONS",
   permitIndex:        "PERMIT",
   housingStarts:      "HOUST",
+  monthlySupply:      "MSACSR",
   retailSales:        "RSAFS",
   corporateBonds:     "BAMLC0A0CM",
 } as const;

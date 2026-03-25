@@ -134,7 +134,7 @@ function LineChartInner({
         )}
       </div>
 
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} minHeight={height}>
         <RechartsLine
           data={thinned}
           margin={{ top: 4, right: 8, left: -8, bottom: 0 }}
@@ -197,9 +197,7 @@ function LineChartInner({
               dot={false}
               connectNulls
               activeDot={{ r: 4, fill: s.color, stroke: "rgba(5,5,10,0.8)", strokeWidth: 2 }}
-              isAnimationActive
-              animationDuration={1200}
-              animationEasing="ease-out"
+              isAnimationActive={false}
             />
           ))}
         </RechartsLine>

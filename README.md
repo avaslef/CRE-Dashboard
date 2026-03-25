@@ -101,30 +101,48 @@ Open **http://localhost:3000**
 
 ## Data Sources
 
-| Source | Data | Free Tier |
-|--------|------|-----------|
-| [FRED (St. Louis Fed)](https://fred.stlouisfed.org) | CRE price index, unemployment, rates, GDP, yield curve | ✅ Unlimited |
-| [U.S. Census Bureau](https://api.census.gov) | Population, income, business patterns | ✅ Unlimited |
-| [NewsAPI.org](https://newsapi.org) | CRE news, deals, legislation | ✅ 100 req/day |
-| [Google Trends](https://trends.google.com) | CRE search interest (embedded iframes) | ✅ Free |
+| Source | Institution | Data | Free Tier |
+| ------ | ----------- | ---- | --------- |
+| [FRED (St. Louis Fed)](https://fred.stlouisfed.org) | Federal Reserve | Aggregates 800,000+ economic series from multiple providers | ✅ Unlimited |
+| → via FRED | **BEA** (Bureau of Economic Analysis) | GDP growth (`A191RL1Q225SBEA`) | ✅ Via FRED |
+| → via FRED | **BLS** (Bureau of Labor Statistics) | Unemployment, CPI, payrolls (`UNRATE`, `CPIAUCSL`) | ✅ Via FRED |
+| → via FRED | **U.S. Treasury / Federal Reserve** | Treasury yields, Fed Funds (`DGS10`, `DGS2`, `FEDFUNDS`) | ✅ Via FRED |
+| → via FRED | **Freddie Mac** | 30-yr mortgage rate (`MORTGAGE30US`) | ✅ Via FRED |
+| → via FRED | **ICE BofA** | High yield & corporate credit spreads (`BAMLH0A0HYM2`, `BAMLC0A0CM`) | ✅ Via FRED |
+| → via FRED | **CoStar / NCREIF** | National CRE price index (`COMREPUSQ159N`) | ✅ Via FRED |
+| → via FRED | **S&P / Case-Shiller** | Home price index (`CSUSHPINSA`) | ✅ Via FRED |
+| → via FRED | **CBOE** | Volatility index (`VIXCLS`) | ✅ Via FRED |
+| → via FRED | **U.S. Census Bureau** | Construction spending, housing starts, permits, retail sales (`TLNRESCONS`, `HOUST`, `PERMIT`, `MSACSR`, `RSAFS`) | ✅ Via FRED |
+| [U.S. Census Bureau API](https://api.census.gov) | U.S. Census Bureau | Population, median income, business patterns (ACS 5-yr, CBP) | ✅ Unlimited |
+| [NewsAPI.org](https://newsapi.org) | NewsAPI | CRE news headlines, deals, legislation | ✅ 100 req/day |
+| [Google Trends](https://trends.google.com) | Google | CRE search interest / CSHI signals (embedded iframes) | ✅ Embed only |
 
 ---
 
 ## Key FRED Series
 
-| Series ID | Description |
-|-----------|-------------|
-| `COMREPUSQ159N` | National CRE Price Index |
-| `FEDFUNDS` | Federal Funds Rate |
-| `UNRATE` | National Unemployment Rate |
-| `DGS10` | 10-Year Treasury Yield |
-| `DGS2` | 2-Year Treasury Yield |
-| `MORTGAGE30US` | 30-Year Mortgage Rate |
-| `BAMLH0A0HYM2` | High Yield OAS Spread |
-| `RALE537URN` | Raleigh-Cary Unemployment |
-| `DURH063URN` | Durham Unemployment |
-| `NCURN` | North Carolina Unemployment |
-| `TLNRESCONS` | Non-Residential Construction Spending |
+| Series ID | Description | Originating Institution |
+| --------- | ----------- | ----------------------- |
+| `COMREPUSQ159N` | National CRE Price Index | CoStar / NCREIF |
+| `A191RL1Q225SBEA` | Real GDP Growth Rate (quarterly) | BEA |
+| `FEDFUNDS` | Federal Funds Rate | Federal Reserve |
+| `UNRATE` | National Unemployment Rate | BLS |
+| `CPIAUCSL` | Consumer Price Index (All Urban) | BLS |
+| `DGS10` | 10-Year Treasury Yield | U.S. Treasury / Fed |
+| `DGS2` | 2-Year Treasury Yield | U.S. Treasury / Fed |
+| `MORTGAGE30US` | 30-Year Fixed Mortgage Rate | Freddie Mac |
+| `BAMLH0A0HYM2` | High Yield OAS Spread | ICE BofA |
+| `BAMLC0A0CM` | Corporate Bond OAS Spread | ICE BofA |
+| `CSUSHPINSA` | S&P/Case-Shiller Home Price Index | S&P / Case-Shiller |
+| `VIXCLS` | CBOE Volatility Index (VIX) | CBOE |
+| `TLNRESCONS` | Non-Residential Construction Spending | U.S. Census Bureau |
+| `HOUST` | Housing Starts | U.S. Census Bureau |
+| `PERMIT` | Building Permits | U.S. Census Bureau |
+| `MSACSR` | Monthly Supply of Houses | U.S. Census Bureau |
+| `RSAFS` | Advance Retail Sales | U.S. Census Bureau |
+| `RALE537URN` | Raleigh-Cary Unemployment | BLS |
+| `DURH537URN` | Durham Unemployment | BLS |
+| `NCURN` | North Carolina Unemployment | BLS |
 
 ---
 

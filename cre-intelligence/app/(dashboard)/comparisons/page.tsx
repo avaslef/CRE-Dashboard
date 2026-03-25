@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart2, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { GlowBadge } from "@/components/ui/GlowBadge";
-import { KPICardSkeleton } from "@/components/ui/LoadingSkeleton";
-import { BarChart } from "@/components/charts/BarChart";
 import { InsightCard } from "@/components/ui/InsightCard";
 import { MARKET_TIERS, TIER_COLOR_MAP } from "@/lib/constants";
-import { fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
+import { fetchFredLatest, fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
 import { exportCsv } from "@/lib/utils";
 import { Download } from "lucide-react";
+import { NATIONAL_SERIES } from "@/lib/constants";
 
 interface MarketRow {
   market: string;
@@ -23,6 +22,7 @@ type SortField = "market" | "unemp" | "tier";
 
 export default function ComparisonsPage() {
   const [rows, setRows] = useState<MarketRow[]>([]);
+  const [nationalUnemp, setNationalUnemp] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<SortField>("unemp");
   const [sortAsc, setSortAsc] = useState(true);
@@ -32,9 +32,12 @@ export default function ComparisonsPage() {
     async function load() {
       setLoading(true);
       const allMarkets = getAllMarkets(MARKET_TIERS as any);
-      const unempMap = await fetchFredLatestBatched(
-        allMarkets.map((m) => ({ key: m.name, seriesId: m.fredUnemp }))
-      );
+      const [unempMap, natUnemp] = await Promise.all([
+        fetchFredLatestBatched(
+          allMarkets.map((m) => ({ key: m.name, seriesId: m.fredUnemp }))
+        ),
+        fetchFredLatest(NATIONAL_SERIES.nationalUnemp),
+      ]);
       const withUnemp: MarketRow[] = allMarkets.map((m) => ({
         market: m.name,
         tier: m.tier,
@@ -42,6 +45,7 @@ export default function ComparisonsPage() {
         unemp: unempMap[m.name] ?? null,
       }));
       setRows(withUnemp);
+      setNationalUnemp(natUnemp);
       setLoading(false);
     }
     load();
@@ -65,11 +69,6 @@ export default function ComparisonsPage() {
     if (sortField === field) setSortAsc((prev) => !prev);
     else { setSortField(field); setSortAsc(true); }
   };
-
-  const chartData = sorted
-    .filter((r) => r.unemp != null)
-    .slice(0, 20)
-    .map((r) => ({ Market: r.market, Unemployment: r.unemp!, Tier: r.tier }));
 
   const insights = [
     "Comparing unemployment across tiers reveals that Tier 2 markets have closed the gap vs. Gateway over 5 years.",
@@ -114,24 +113,102 @@ export default function ComparisonsPage() {
         </button>
       </div>
 
-      {/* Chart */}
-      {!loading && chartData.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <BarChart
-            data={chartData}
-            xKey="Unemployment"
-            yKey="Market"
-            title="Unemployment Rate — Top 20 Markets (%)"
-            orientation="horizontal"
-            colorKey="Tier"
-            colorMap={tierColorMap}
-            height={Math.max(400, chartData.length * 28)}
-            yAxisWidth={160}
-            showLabels
-            exportFilename="market_unemployment.csv"
-          />
+      {/* Multi-Metric Market Scorecard */}
+      <div className="glass" style={{ marginBottom: 24, overflow: "hidden" }}>
+        <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-dim)" }}>
+            Multi-Metric Market Scorecard
+          </span>
+          {nationalUnemp != null && (
+            <span style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", marginLeft: "auto" }}>
+              National avg: <strong style={{ color: "#a855f7" }}>{nationalUnemp.toFixed(1)}%</strong> (UNRATE)
+            </span>
+          )}
         </div>
-      )}
+
+        {/* Scorecard header */}
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1.2fr", padding: "10px 18px", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-dim)", gap: 8 }}>
+          <span>Market</span>
+          <span>Tier</span>
+          <span>Rate</span>
+          <span>vs National</span>
+          <span>Signal</span>
+        </div>
+
+        {/* National avg reference row */}
+        {!loading && nationalUnemp != null && (
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1.2fr", padding: "9px 18px", borderBottom: "1px solid rgba(168,85,247,0.15)", background: "rgba(168,85,247,0.05)", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#a855f7" }}>National Average</span>
+            <span style={{ fontSize: "0.72rem", color: "var(--color-text-dim)" }}>—</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, color: "#a855f7" }}>{nationalUnemp.toFixed(1)}%</span>
+            <span style={{ fontSize: "0.72rem", color: "var(--color-text-dim)" }}>Benchmark</span>
+            <span style={{ fontSize: "0.72rem", color: "var(--color-text-dim)" }}>UNRATE</span>
+          </div>
+        )}
+
+        {/* Market rows */}
+        <div style={{ maxHeight: 480, overflowY: "auto" }}>
+          {loading
+            ? Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1.2fr", padding: "10px 18px", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <div className="skeleton" style={{ height: 14 }} />
+                  <div className="skeleton" style={{ height: 14, width: "60%" }} />
+                  <div className="skeleton" style={{ height: 14, width: "40%" }} />
+                  <div className="skeleton" style={{ height: 14, width: "70%" }} />
+                  <div className="skeleton" style={{ height: 14, width: "80%" }} />
+                </div>
+              ))
+            : sorted.map((row, i) => {
+                const delta = row.unemp != null && nationalUnemp != null ? row.unemp - nationalUnemp : null;
+                const deltaColor = delta == null ? "var(--color-text-dim)"
+                  : delta < -0.5 ? "#00ff9d"
+                  : delta > 0.5 ? "#ef4444"
+                  : "#fcd34d";
+                const signal = delta == null ? "—"
+                  : delta < -0.5 ? "Outperforming"
+                  : delta > 0.5 ? "Underperforming"
+                  : "At National";
+                const barWidth = row.unemp != null ? Math.min((row.unemp / 10) * 100, 100) : 0;
+                return (
+                  <motion.div
+                    key={row.market}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.02 }}
+                    style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1.2fr", padding: "10px 18px", borderBottom: "1px solid rgba(255,255,255,0.04)", alignItems: "center", gap: 8 }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,245,255,0.025)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: "0.82rem", color: "var(--color-text)", fontWeight: row.market.includes("Raleigh") ? 600 : 400 }}>
+                      {row.market.includes("Raleigh") ? "★ " : ""}{row.market}
+                    </span>
+                    <span className={`badge ${row.tier === "Gateway" ? "badge-gateway" : row.tier === "Tier 1" ? "badge-tier1" : "badge-tier2"}`}>
+                      {row.tier === "Tier 2 / Emerging" ? "T2" : row.tier === "Tier 1" ? "T1" : "GW"}
+                    </span>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontFamily: "var(--font-display)", fontSize: "0.9rem", fontWeight: 700, color: row.unemp != null ? row.color : "var(--color-text-dim)" }}>
+                          {row.unemp != null ? `${row.unemp.toFixed(1)}%` : "—"}
+                        </span>
+                      </div>
+                      {row.unemp != null && (
+                        <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.06)", marginTop: 4, maxWidth: 60 }}>
+                          <div style={{ height: "100%", width: `${barWidth}%`, borderRadius: 2, background: row.color, transition: "width 0.4s" }} />
+                        </div>
+                      )}
+                    </div>
+                    <span style={{ fontSize: "0.78rem", fontWeight: 600, color: deltaColor }}>
+                      {delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)}pp ${delta < 0 ? "▲" : delta > 0 ? "▼" : ""}`}
+                    </span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 500, color: deltaColor }}>
+                      {signal}
+                    </span>
+                  </motion.div>
+                );
+              })
+          }
+        </div>
+      </div>
 
       {/* Table */}
       <div className="glass" style={{ overflow: "hidden", marginBottom: 28 }}>

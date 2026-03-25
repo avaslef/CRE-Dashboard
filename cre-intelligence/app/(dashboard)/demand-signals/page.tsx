@@ -119,7 +119,7 @@ export default function DemandSignalsPage() {
           Array.from({ length: 3 }).map((_, i) => <KPICardSkeleton key={i} />)
         ) : (
           <>
-            <NumericKPICard title="Retail Sales" value={kpis.retailSales} prefix="$" suffix="M" decimals={0} subtitle="Advance retail & food services" icon={<Activity size={16} />} color="green" />
+            <NumericKPICard title="Retail Sales" value={kpis.retailSales != null ? kpis.retailSales * 1e6 : null} prefix="$" decimals={2} abbrev subtitle="Advance retail & food services" icon={<Activity size={16} />} color="green" />
             <NumericKPICard title="National Unemployment" value={kpis.natUnemp} suffix="%" subtitle="Employment health signal" color="cyan" />
             <NumericKPICard title="GDP Growth" value={kpis.gdpGrowth} suffix="%" subtitle="Real GDP quarterly" icon={<TrendingUp size={16} />} color="purple" />
           </>

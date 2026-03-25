@@ -148,7 +148,7 @@ function BarChartInner({
         )}
       </div>
 
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} minHeight={height}>
         <RechartsBar
           data={data}
           layout={isHorizontal ? "vertical" : "horizontal"}
@@ -189,9 +189,7 @@ function BarChartInner({
           <Bar
             dataKey={isHorizontal ? xKey : yKey}
             radius={isHorizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
-            isAnimationActive
-            animationDuration={1000}
-            animationEasing="ease-out"
+            isAnimationActive={false}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getColor(entry, index)} fillOpacity={0.85} />

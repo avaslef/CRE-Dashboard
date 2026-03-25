@@ -14,24 +14,25 @@ import type { FredObservation } from "@/types";
 
 
 export default function HousingPage() {
-  const [kpis, setKpis] = useState({ mortgage: null as number | null, housingStarts: null as number | null, permits: null as number | null });
+  const [kpis, setKpis] = useState({ mortgage: null as number | null, housingStarts: null as number | null, permits: null as number | null, monthlySupply: null as number | null });
   const [housingData, setHousingData] = useState<Record<string, FredObservation[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [mortgage, housingStarts, permits, housing] = await Promise.all([
+      const [mortgage, housingStarts, permits, monthlySupply, housing] = await Promise.all([
         fetchFredLatest(NATIONAL_SERIES.mortgage30yr),
         fetchFredLatest(NATIONAL_SERIES.housingStarts),
         fetchFredLatest(NATIONAL_SERIES.permitIndex),
+        fetchFredLatest(NATIONAL_SERIES.monthlySupply),
         fetchFredMulti({
           "Housing Starts":   NATIONAL_SERIES.housingStarts,
           "Building Permits": NATIONAL_SERIES.permitIndex,
           "30-Yr Mortgage":   NATIONAL_SERIES.mortgage30yr,
         }),
       ]);
-      setKpis({ mortgage, housingStarts, permits });
+      setKpis({ mortgage, housingStarts, permits, monthlySupply });
       setHousingData(housing);
       setLoading(false);
     }
@@ -39,6 +40,19 @@ export default function HousingPage() {
   }, []);
 
   const housingChart = fredToChartData(housingData);
+
+  const cshi = kpis.monthlySupply != null && kpis.mortgage != null
+    ? Math.round(
+        Math.min(Math.max((kpis.monthlySupply - 2.0) / 10.0 * 60, 0), 60) +
+        Math.min(Math.max((kpis.mortgage - 3.0) / 5.5 * 40, 0), 40)
+      )
+    : null;
+
+  const cshiColor = cshi == null ? "#fca5a5"
+    : cshi < 35 ? "#00ff9d"
+    : cshi < 50 ? "#00ff9d"
+    : cshi < 65 ? "#fcd34d"
+    : "#ef4444";
 
   const insights = [
     "Mortgage rates above 6.5% have suppressed for-sale inventory, indirectly boosting multifamily demand.",
@@ -116,17 +130,20 @@ export default function HousingPage() {
             <GlowBadge label="Google Trends Composite" variant="triangle" />
           </div>
           <p style={{ fontSize: "0.82rem", color: "var(--color-text-muted)", lineHeight: 1.7, marginBottom: 20 }}>
-            A composite index aggregating Google Trends search interest across 12 seller-distress and housing-stress signals.
-            Higher scores indicate elevated seller anxiety; lower scores reflect healthy transaction velocity.
-            Live CSHI scoring requires direct Trends API access (pytrends) — use the links below to monitor individual signals.
+            A composite stress index derived from FRED housing data (MSACSR + MORTGAGE30US).
+            Higher scores indicate elevated seller anxiety and buyer-market conditions; lower scores reflect healthy transaction velocity.
+            Search signals below can supplement with real-time Google Trends sentiment.
           </p>
 
           {/* Score display */}
           <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 20, flexWrap: "wrap" }}>
-            <div style={{ padding: "14px 24px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, textAlign: "center", minWidth: 120 }}>
+            <div style={{ padding: "14px 24px", background: "rgba(239,68,68,0.06)", border: `1px solid ${cshiColor}40`, borderRadius: 12, textAlign: "center", minWidth: 120 }}>
               <p style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>CSHI Score</p>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, color: "#fca5a5", lineHeight: 1 }}>N/A</p>
-              <p style={{ fontSize: "0.65rem", color: "var(--color-text-dim)", marginTop: 6 }}>Requires Trends API</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, color: cshiColor, lineHeight: 1 }}>
+                {loading ? "…" : cshi != null ? cshi : "N/A"}
+              </p>
+              <p style={{ fontSize: "0.65rem", color: "var(--color-text-dim)", marginTop: 6 }}>FRED housing stress composite</p>
+              <p style={{ fontSize: "0.6rem", color: "var(--color-text-dim)", marginTop: 2 }}>MSACSR + MORTGAGE30US</p>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {[
@@ -146,7 +163,7 @@ export default function HousingPage() {
           {/* 12-term signal table */}
           <div style={{ borderTop: "1px solid rgba(239,68,68,0.1)", paddingTop: 16 }}>
             <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-dim)", marginBottom: 12 }}>
-              Aggregated Search Signals (12 terms)
+              Aggregated Search Signals (20 terms)
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 8 }}>
               {[
@@ -162,6 +179,14 @@ export default function HousingPage() {
                 { kw: "seller concession",       desc: "Sellers offering credits — demand weakness" },
                 { kw: "housing bubble",          desc: "Speculative fear index" },
                 { kw: "extend listing days",     desc: "Stale inventory, reduced showing velocity" },
+                { kw: "home price cut",          desc: "Active price reductions on listed properties" },
+                { kw: "real estate market slow", desc: "Broad market velocity slowdown signal" },
+                { kw: "overpriced house",        desc: "Buyer perception of overvaluation" },
+                { kw: "no offers on house",      desc: "Failed listing — zero buyer engagement" },
+                { kw: "house sitting on market", desc: "Extended days-on-market, stale listing signal" },
+                { kw: "home value drop",         desc: "Declining property value expectations" },
+                { kw: "foreclosure risk",        desc: "Distress signal — default and foreclosure fears" },
+                { kw: "days on market increase", desc: "Lengthening time-to-sale across inventory" },
               ].map(({ kw, desc }) => (
                 <div key={kw} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 8, gap: 8 }}>
                   <div style={{ minWidth: 0 }}>

@@ -6,7 +6,7 @@ import { TrendingUp, Activity, Building2 } from "lucide-react";
 import { NumericKPICard } from "@/components/ui/KPICard";
 import { KPICardSkeleton, ChartSkeleton } from "@/components/ui/LoadingSkeleton";
 import { InsightCard } from "@/components/ui/InsightCard";
-import { LineChart, fredToChartData } from "@/components/charts/LineChart";
+import { LineChart, fredToChartData, computeFedFundsDiff } from "@/components/charts/LineChart";
 import { NATIONAL_SERIES, MACRO_INSIGHTS } from "@/lib/constants";
 import { fetchFredLatest, fetchFredMulti } from "@/lib/api";
 import type { FredObservation } from "@/types";
@@ -40,7 +40,8 @@ export default function MacroTrendsPage() {
           "Construction Spend": NATIONAL_SERIES.constructionSpend,
         }),
         fetchFredMulti({
-          "Fed Funds Rate": NATIONAL_SERIES.fedFundsRate,
+          "FF Lower":       NATIONAL_SERIES.fedFundsLower,
+          "FF Upper":       NATIONAL_SERIES.fedFundsUpper,
           "10-Yr Treasury": NATIONAL_SERIES.treasury10yr,
           "30-Yr Mortgage": NATIONAL_SERIES.mortgage30yr,
         }),
@@ -51,7 +52,9 @@ export default function MacroTrendsPage() {
       ]);
       setKpis({ gdpGrowth, cpi, natUnemp, fedFunds, t10yr, constrSpend });
       setMacroData(macro);
-      setRatesData(rates);
+      // Compute band diff: upper − lower (always 25bps since Dec 2008)
+      const ffDiff = computeFedFundsDiff(rates["FF Lower"] ?? [], rates["FF Upper"] ?? []);
+      setRatesData({ "FF Lower": rates["FF Lower"] ?? [], "FF Diff": ffDiff, "10-Yr Treasury": rates["10-Yr Treasury"] ?? [], "30-Yr Mortgage": rates["30-Yr Mortgage"] ?? [] });
       setLaborData(labor);
       setLoading(false);
     }
@@ -100,7 +103,8 @@ export default function MacroTrendsPage() {
             <LineChart
               data={ratesChart}
               series={[
-                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444", type: "stepAfter" },
+                { key: "FF Lower", label: "Fed Funds Rate", color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0, strokeOpacity: 0.55, strokeWidth: 1.5, type: "stepAfter" },
+                { key: "FF Diff",  label: "FF +25bps",      color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0.18, strokeOpacity: 0, strokeWidth: 0, type: "stepAfter", bandBaseKey: "FF Lower" },
                 { key: "10-Yr Treasury", label: "10-Yr Treasury", color: "#00f5ff" },
                 { key: "30-Yr Mortgage", label: "30-Yr Mortgage", color: "#f59e0b" },
               ]}

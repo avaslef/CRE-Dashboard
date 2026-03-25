@@ -104,6 +104,13 @@ export async function fetchCensusMedianIncome(stateFips = "37") {
   return (await res.json()).data ?? [];
 }
 
+/** Fetch Census ACS median gross rent data (B25064) */
+export async function fetchCensusGrossRent(stateFips = "37") {
+  const res = await fetch(`${BASE}/api/census?type=rent&state=${stateFips}`);
+  if (!res.ok) return [];
+  return (await res.json()).data ?? [];
+}
+
 /** Fetch Census County Business Patterns (CBP) */
 export async function fetchCensusCBP(stateFips = "37", naics = "531") {
   const res = await fetch(`${BASE}/api/census?type=cbp&state=${stateFips}&naics=${naics}`);

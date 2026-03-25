@@ -11,7 +11,7 @@ import { KPICard, NumericKPICard } from "@/components/ui/KPICard";
 import { KPICardSkeleton, ChartSkeleton } from "@/components/ui/LoadingSkeleton";
 import { InsightCard } from "@/components/ui/InsightCard";
 import { GlowBadge } from "@/components/ui/GlowBadge";
-import { LineChart, fredToChartData } from "@/components/charts/LineChart";
+import { LineChart, fredToChartData, computeFedFundsDiff } from "@/components/charts/LineChart";
 import { MARKET_TIERS, NATIONAL_SERIES, OVERVIEW_INSIGHTS } from "@/lib/constants";
 import { fetchFredLatest, fetchFredMulti, fetchFredSeries, fetchFredLatestBatched, getAllMarkets } from "@/lib/api";
 import type { FredObservation } from "@/types";
@@ -48,14 +48,16 @@ export default function OverviewPage() {
         fetchFredLatest(NATIONAL_SERIES.mortgage30yr),
         fetchFredSeries(NATIONAL_SERIES.crePrice),
         fetchFredMulti({
-          "Fed Funds Rate": NATIONAL_SERIES.fedFundsRate,
+          "FF Lower":       NATIONAL_SERIES.fedFundsLower,
+          "FF Upper":       NATIONAL_SERIES.fedFundsUpper,
           "10-Yr Treasury": NATIONAL_SERIES.treasury10yr,
           "30-Yr Mortgage": NATIONAL_SERIES.mortgage30yr,
         }),
       ]);
       setKpis({ fedRate, natUnemp, treasury10yr, crePrice, mortgage });
       setCreHistory(cre);
-      setRatesHistory(rates);
+      const ffDiff = computeFedFundsDiff(rates["FF Lower"] ?? [], rates["FF Upper"] ?? []);
+      setRatesHistory({ "FF Lower": rates["FF Lower"] ?? [], "FF Diff": ffDiff, "10-Yr Treasury": rates["10-Yr Treasury"] ?? [], "30-Yr Mortgage": rates["30-Yr Mortgage"] ?? [] });
 
       // Fetch unemployment for all markets — batched to avoid FRED rate limiting
       const allMarkets = getAllMarkets(MARKET_TIERS as any);
@@ -170,7 +172,8 @@ export default function OverviewPage() {
             <LineChart
               data={ratesData}
               series={[
-                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444", type: "stepAfter" },
+                { key: "FF Lower", label: "Fed Funds Rate", color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0, strokeOpacity: 0.55, strokeWidth: 1.5, type: "stepAfter" },
+                { key: "FF Diff",  label: "FF +25bps",      color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0.18, strokeOpacity: 0, strokeWidth: 0, type: "stepAfter", bandBaseKey: "FF Lower" },
                 { key: "10-Yr Treasury", label: "10-Yr Treasury", color: "#00f5ff" },
                 { key: "30-Yr Mortgage", label: "30-Yr Mortgage", color: "#f59e0b" },
               ]}

@@ -6,8 +6,8 @@ import { Building2, TrendingDown, AlertTriangle } from "lucide-react";
 import { NumericKPICard } from "@/components/ui/KPICard";
 import { KPICardSkeleton, ChartSkeleton } from "@/components/ui/LoadingSkeleton";
 import { InsightCard } from "@/components/ui/InsightCard";
-import { LineChart, fredToChartData } from "@/components/charts/LineChart";
-import { CAPITAL_SERIES } from "@/lib/constants";
+import { LineChart, fredToChartData, computeFedFundsDiff } from "@/components/charts/LineChart";
+import { CAPITAL_SERIES, NATIONAL_SERIES } from "@/lib/constants";
 import { fetchFredLatest, fetchFredMulti } from "@/lib/api";
 import type { FredObservation } from "@/types";
 
@@ -29,7 +29,8 @@ export default function CapitalMarketsPage() {
         fetchFredMulti({
           "10-Yr Treasury":  CAPITAL_SERIES.tenYrTreasury,
           "2-Yr Treasury":   CAPITAL_SERIES.twoYrTreasury,
-          "Fed Funds Rate":  CAPITAL_SERIES.fedFunds,
+          "FF Lower":        NATIONAL_SERIES.fedFundsLower,
+          "FF Upper":        NATIONAL_SERIES.fedFundsUpper,
           "30-Yr Mortgage":  CAPITAL_SERIES.mortgage30yr,
         }),
         fetchFredMulti({
@@ -37,7 +38,8 @@ export default function CapitalMarketsPage() {
         }),
       ]);
       setKpis({ t10, t2, fedFunds, mortgage, hySpread });
-      setRatesData(rates);
+      const ffDiff = computeFedFundsDiff(rates["FF Lower"] ?? [], rates["FF Upper"] ?? []);
+      setRatesData({ "10-Yr Treasury": rates["10-Yr Treasury"] ?? [], "2-Yr Treasury": rates["2-Yr Treasury"] ?? [], "FF Lower": rates["FF Lower"] ?? [], "FF Diff": ffDiff, "30-Yr Mortgage": rates["30-Yr Mortgage"] ?? [] });
       setSpreadData(spreads);
       setLoading(false);
     }
@@ -102,8 +104,9 @@ export default function CapitalMarketsPage() {
               series={[
                 { key: "10-Yr Treasury", label: "10-Yr Treasury", color: "#00f5ff" },
                 { key: "2-Yr Treasury",  label: "2-Yr Treasury",  color: "#a855f7" },
-                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444", type: "stepAfter" },
-                { key: "30-Yr Mortgage",label: "30-Yr Mortgage",  color: "#f59e0b" },
+                { key: "FF Lower", label: "Fed Funds Rate", color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0, strokeOpacity: 0.55, strokeWidth: 1.5, type: "stepAfter" },
+                { key: "FF Diff",  label: "FF +25bps",      color: "#ef4444", area: true, stackId: "ff", fillOpacity: 0.18, strokeOpacity: 0, strokeWidth: 0, type: "stepAfter", bandBaseKey: "FF Lower" },
+                { key: "30-Yr Mortgage", label: "30-Yr Mortgage",  color: "#f59e0b" },
               ]}
               title="U.S. Interest Rate Landscape (%)"
               yAxisLabel="Rate (%)"

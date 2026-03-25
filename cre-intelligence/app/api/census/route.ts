@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const ACS_BASE = "https://api.census.gov/data/2022/acs/acs5";
 const CBP_BASE = "https://api.census.gov/data/2021/cbp";
 
-const VALID_TYPES = new Set(["population", "income", "cbp"]);
+const VALID_TYPES = new Set(["population", "income", "cbp", "rent"]);
 // State FIPS: 1–2 digits
 const STATE_RE = /^\d{1,2}$/;
 // NAICS codes: 2–6 digits
@@ -45,6 +45,12 @@ export async function GET(req: NextRequest) {
       url.searchParams.set("for", "county:*");
       url.searchParams.set("in", `state:${state}`);
       url.searchParams.set("key", apiKey);
+    } else if (type === "rent") {
+      url = new URL(ACS_BASE);
+      url.searchParams.set("get", "NAME,B25064_001E");
+      url.searchParams.set("for", "county:*");
+      url.searchParams.set("in", `state:${state}`);
+      url.searchParams.set("key", apiKey);
     } else if (type === "cbp") {
       url = new URL(CBP_BASE);
       url.searchParams.set("get", "NAME,NAICS2017,EMP,PAYANN,ESTAB");
@@ -80,6 +86,8 @@ export async function GET(req: NextRequest) {
         row.population = d.B01003_001E != null ? parseInt(d.B01003_001E, 10) : null;
       } else if (type === "income") {
         row.median_income = d.B19013_001E != null ? parseInt(d.B19013_001E, 10) : null;
+      } else if (type === "rent") {
+        row.gross_rent = d.B25064_001E != null ? parseInt(d.B25064_001E, 10) : null;
       } else if (type === "cbp") {
         row.EMP    = d.EMP    != null ? parseInt(d.EMP, 10)    : null;
         row.PAYANN = d.PAYANN != null ? parseInt(d.PAYANN, 10) : null;

@@ -60,6 +60,8 @@ export const MARKET_TIERS: MarketTiers = {
 export const NATIONAL_SERIES = {
   crePrice:           "COMREPUSQ159N",
   fedFundsRate:       "FEDFUNDS",
+  fedFundsLower:      "DFEDTARL",   // Fed target range — lower limit (daily, Dec 2008+)
+  fedFundsUpper:      "DFEDTARU",   // Fed target range — upper limit (daily, Dec 2008+)
   nationalUnemp:      "UNRATE",
   treasury10yr:       "DGS10",
   cpi:                "CPIAUCSL",
@@ -79,6 +81,21 @@ export const TRIANGLE_SERIES = {
   raleighLaborForce: "RALEURNLF",
   durhamLaborForce:  "DURHURNLF",
   ncUnemp:           "NCURN",
+  // Home Price Indices — FHFA All-Transactions HPI (quarterly)
+  raleighHPI:        "ATNHPIUS39580Q",
+  durhamHPI:         "ATNHPIUS20500Q",
+  nationalHPI:       "USSTHPI",
+  // Per Capita Personal Income — BEA via FRED (annual)
+  raleighPCPI:       "PCPI39580",
+  durhamPCPI:        "PCPI20500",
+  nationalPCPI:      "A792RC0A052NBEA",
+  // Employment by Sector — BLS CES, Raleigh-Cary MSA (thousands NSA)
+  raleighEmpTotal:   "SMS37395800000000001",
+  raleighEmpProBus:  "SMS37395800600000001",
+  raleighEmpEdHlth:  "SMS37395800650000001",
+  raleighEmpGovt:    "SMS37395800900000001",
+  raleighEmpConst:   "SMS37395800200000001",
+  raleighEmpInfo:    "SMS37395800500000001",
 } as const;
 
 export const CAPITAL_SERIES = {

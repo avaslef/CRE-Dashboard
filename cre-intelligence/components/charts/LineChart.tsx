@@ -21,6 +21,8 @@ interface LineChartSeries {
   key: string;
   label: string;
   color: string;
+  /** Recharts line interpolation type. Use "stepAfter" for policy/rate series. Default: "monotone" */
+  type?: "monotone" | "stepAfter" | "stepBefore" | "linear" | "step";
 }
 
 interface LineChartProps {
@@ -189,7 +191,7 @@ function LineChartInner({
           {series.map((s) => (
             <Line
               key={s.key}
-              type="monotone"
+              type={s.type ?? "monotone"}
               dataKey={s.key}
               name={s.label}
               stroke={s.color}

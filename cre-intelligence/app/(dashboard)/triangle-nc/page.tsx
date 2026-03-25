@@ -146,7 +146,7 @@ export default function TriangleNCPage() {
               data={ratesData}
               series={[
                 { key: "10-Yr Treasury", label: "10-Yr Treasury", color: "#00f5ff" },
-                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444" },
+                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444", type: "stepAfter" },
               ]}
               title="National Rates (CRE Cost of Capital)"
               yAxisLabel="Rate (%)"

@@ -198,7 +198,7 @@ export default function ComparisonsPage() {
                       )}
                     </div>
                     <span style={{ fontSize: "0.78rem", fontWeight: 600, color: deltaColor }}>
-                      {delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)}pp ${delta < 0 ? "▲" : delta > 0 ? "▼" : ""}`}
+                      {delta == null ? "—" : `${delta > 0 ? "+" : ""}${Math.round(delta * 100)}bps ${delta < 0 ? "▲" : delta > 0 ? "▼" : ""}`}
                     </span>
                     <span style={{ fontSize: "0.75rem", fontWeight: 500, color: deltaColor }}>
                       {signal}

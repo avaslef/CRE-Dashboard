@@ -20,10 +20,10 @@ const BROKERAGE_LINKS = [
 ];
 
 const PRESET_QUERIES = [
-  { label: "Brokerage Reports",  query: "CBRE JLL Cushman commercial real estate report 2024" },
-  { label: "Office Research",    query: "office market research vacancy rent 2024 brokerage" },
-  { label: "Industrial Report",  query: "industrial market report logistics warehouse 2024" },
-  { label: "NC CRE Research",    query: "North Carolina commercial real estate market research" },
+  { label: "Brokerage Reports",  query: "CBRE JLL Cushman commercial real estate market outlook" },
+  { label: "Office Research",    query: "office market vacancy leasing trends brokerage research" },
+  { label: "Industrial Report",  query: "industrial warehouse logistics real estate market report" },
+  { label: "NC CRE Research",    query: "North Carolina commercial real estate Raleigh Durham market" },
 ];
 
 const insights = [
@@ -35,7 +35,7 @@ const insights = [
 
 export default function ResearchPage() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [query, setQuery] = useState("CBRE JLL Cushman commercial real estate report 2024");
+  const [query, setQuery] = useState("CBRE JLL Cushman commercial real estate market outlook");
   const [loading, setLoading] = useState(false);
 
   async function search() {

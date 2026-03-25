@@ -170,7 +170,7 @@ export default function OverviewPage() {
             <LineChart
               data={ratesData}
               series={[
-                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444" },
+                { key: "Fed Funds Rate", label: "Fed Funds Rate", color: "#ef4444", type: "stepAfter" },
                 { key: "10-Yr Treasury", label: "10-Yr Treasury", color: "#00f5ff" },
                 { key: "30-Yr Mortgage", label: "30-Yr Mortgage", color: "#f59e0b" },
               ]}

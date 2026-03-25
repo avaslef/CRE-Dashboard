@@ -11,12 +11,12 @@ import { fetchNews } from "@/lib/api";
 import type { NewsArticle } from "@/types";
 
 const PRESET_QUERIES = [
-  { label: "CRE Deals",     query: "commercial real estate deal acquisition 2024" },
-  { label: "Office Market", query: "office real estate vacancy leasing 2024" },
+  { label: "CRE Deals",     query: "commercial real estate deal acquisition investment" },
+  { label: "Office Market", query: "office real estate vacancy leasing market" },
   { label: "Industrial",    query: "industrial warehouse logistics real estate" },
   { label: "Multifamily",   query: "multifamily apartment real estate investment" },
   { label: "Cap Rates",     query: "cap rate capitalization commercial real estate" },
-  { label: "REIT News",     query: "REIT real estate investment trust 2024" },
+  { label: "REIT News",     query: "REIT real estate investment trust earnings" },
 ];
 
 const insights = [
@@ -28,7 +28,7 @@ const insights = [
 
 export default function DealFlowPage() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [query, setQuery] = useState("commercial real estate deal acquisition investment 2024");
+  const [query, setQuery] = useState("commercial real estate deal acquisition investment");
   const [count, setCount] = useState(10);
   const [loading, setLoading] = useState(false);
 
